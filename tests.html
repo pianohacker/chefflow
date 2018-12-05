@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Tests - Chefflow</title>
+		<link href="https://unpkg.com/mocha/mocha.css" rel="stylesheet" />
+	</head>
+	<body>
+		<script src="https://unpkg.com/chai/chai.js"></script>
+		<script src="https://unpkg.com/mocha/mocha.js"></script>
+
+		<div id="mocha" />
+
+		<script>
+"use strict";
+
+const chefflow = {
+	parseStep(stack, stepContents) {
+		let match;
+
+		if ((match = /^\s*(\S[^:]+)(?:: (.*))?/i.exec(stepContents))) {
+			if (match[2]) {
+				let addedIngredients = match[2].split(/,\s+(?![^(]+\))/)
+					.map(ingredient => ({ingredient}));
+
+				stack.push({text: match[1], inputs: addedIngredients})
+			} else {
+			}
+		}
+	},
+
+	parseRecipe(recipeText) {
+		let stack = [];
+
+		for (let line of recipeText.split('\n')) {
+			chefflow.parseStep(stack, line);
+		}
+
+		return stack;
+	},
+};
+		</script>
+
+		<script>mocha.setup('bdd');</script>
+
+		<script>
+const expect = chai.expect;
+chai.config.truncateThreshold = 0;
+
+function n(text, ...inputs) {
+	if (inputs.length) {
+		return {
+			text,
+			inputs: inputs.map(input => typeof input == 'string' ? n(input) : input)
+		};
+	} else {
+		return {ingredient: text};
+	}
+}
+
+describe('parseRecipe', () => {
+	it('should return a list', () => {
+		let nodes = chefflow.parseRecipe('');
+
+		expect(nodes).to.be.a('array');
+	});
+
+	[
+		[ 'a single action', 'Dice: tomatoes', n('Dice', 'tomatoes') ],
+
+		[
+			'a single action with multiple ingredients',
+			'Dice: tomatoes, onions',
+			n('Dice', 'tomatoes', 'onions')
+		],
+
+		[
+			'ingredients with complex descriptions',
+			'Dice: tomatoes (whole, roasted), onions',
+			n('Dice', 'tomatoes (whole, roasted)', 'onions')
+		],
+	].forEach( ([ testDescription, recipeText, ...expected ]) => {
+		it(`should parse ${testDescription}`, () => {
+			let nodes = chefflow.parseRecipe(recipeText);
+
+			expect(nodes).to.deep.equal(expected);
+		})
+	});
+})
+		</script>
+
+		<script>mocha.checkLeaks(); mocha.run();</script>
+	</body>
+</html>

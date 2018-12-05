@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Examples - Chefflow</title>
+		<link href="https://fonts.googleapis.com/css?family=Rokkitt" rel="stylesheet"> 
+		<style>
+body {
+	font: 16px "Rokkitt";
+	padding: 0;
+}
+
+table {
+	border-collapse: collapse;
+	border: thin solid #ccc;
+	margin-top: 1em;
+}
+
+td, th {
+	border-bottom: thin dotted #ccc;
+	font-weight: normal;
+	text-align: left;
+	padding: .6em 1.75em .6em .5em;
+	position: relative;
+}
+
+th {
+	padding-left: 1.25em;
+}
+
+td[rowspan]:not([rowspan="1"]):before {
+	background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" preserveAspectRatio="none"><path d="M 0 -.1 L 1.1 -.1 L 1.1 1.1 L 0 1.1 L 0 1 C .75 1 .25 .5 1 .5 C .25 .5 .75 0 0 0 Z" fill="white" stroke="%23888" vector-effect="non-scaling-stroke"/></svg>');
+	background-size: 100% 100%;
+	content: ' ';
+	height: calc(100% - 1px);
+	left: -1.5em;
+	position: absolute;
+	top: 1px;
+	width: 1.5em;
+}
+
+code.chefflow-recipe, code.chefflow-recipe-old {
+	white-space: pre-line;
+}
+		</style>
+		<script>
+function renderRecipes() {
+	let recipeNodes = document.querySelectorAll('code.chefflow-recipe');
+
+	for (let recipeNode of recipeNodes) {
+		recipeNode.insertAdjacentElement('afterend', renderRecipe(recipeNode.innerText));
+	}
+}
+
+function renderRecipe(recipeText) {
+	let recipeTable = document.createElement('table');
+	let recipeTbody = document.createElement('tbody');
+	recipeTable.appendChild(recipeTbody);
+
+	let nodes = parseRecipeTree(recipeText);
+
+	let table = [];
+
+	let width, height;
+	let y = 0;
+
+	for (let node of nodes) {
+		[width, height] = layoutRecipeNode(table, node, y);
+
+		y = height;
+	}
+
+	for (let y = 0; y < height; y++) {
+		let row = document.createElement('tr');
+
+		for (let x = 0; x < width; x++) {
+			let node = table[x][y];
+
+			if (!(node instanceof RecipeNode)) continue;
+
+			cell = document.createElement(node.isIngredient ? 'th' : 'td');
+
+			cell.innerText = node.text;
+			cell.setAttribute('rowspan', node.height);
+
+			let nodeWidth = 1;
+			for (let checkX = x + 1; checkX < width; checkX++) {
+				if (table[checkX][y]) break;
+
+				nodeWidth++;
+			}
+
+			cell.setAttribute('colspan', nodeWidth);
+			cell.setAttribute('x', x);
+			cell.setAttribute('y', y);
+
+			row.appendChild(cell);
+		}
+
+		recipeTbody.appendChild(row);
+	}
+
+	return recipeTable;
+}
+
+function parseRecipeTree(recipeText) {
+	let stack = [];
+
+	for (line of recipeText.split('\n')) {
+		let match;
+		if (!(match = /^\s*(\S[^:]+)(?:: (.*))?/.exec(line))) {
+			continue;
+		}
+
+		let text = match[1];
+		let addedIngredients = match[2] ? match[2].split(/,\s*/) : [];
+
+		let inputs = addedIngredients.map(text => new RecipeNode({text, isIngredient: true}));
+
+		if ((match = /(.*) all( .*)?/i.exec(text))) {
+			text = match[1];
+			inputs.unshift(...stack);
+			stack = [];
+		} else {
+			if ((match = /(.*) (in|on)( |$)|combine|assemble/i.exec(text))) {
+				text = match[1] || text;
+				inputs.unshift(stack.pop());
+			}
+
+			if (addedIngredients.length == 0) {
+				inputs.unshift(stack.pop());
+			}
+		}
+
+		stack.push(new RecipeNode({text, inputs}));
+	}
+
+	return stack;
+}
+
+function RecipeNode({text, inputs, isIngredient = false}) {
+	this.text = text;
+	this.inputs = inputs;
+	this.isIngredient = isIngredient;
+}
+
+function layoutRecipeNode(table, node, startY = 0) {
+	node.y = startY;
+
+	let x = 0;
+	let y = startY;
+
+	if (node.inputs) {
+		for (let input of node.inputs) {
+			let [inputRightX, inputBottomY] = layoutRecipeNode(table, input, y);
+
+			if (inputRightX > x) x = inputRightX;
+			y = inputBottomY;
+		}
+	} else {
+		y++;
+	}
+
+	node.x = x;
+	node.height = y - startY;
+
+	table[x] = table[x] || [];
+
+	table[x][startY] = table[x][startY] || node;
+
+	for (let fillY = startY + 1; fillY < y; fillY++) {
+		table[x][fillY] = table[x][fillY] || true;
+	}
+
+	return [x + 1, y];
+}
+
+document.addEventListener('DOMContentLoaded', renderRecipes);
+		</script>
+	</head>
+	<body>
+		<script type="module">
+			import 'https://unpkg.com/chai/register-assert.js';
+			import 'https://unpkg.com/chai/register-expect.js';
+			import 'https://unpkg.com/chai/register-should.js';
+		</script>
+		<code class="chefflow-recipe-old">
+			Beat: 4 (70 g) large egg yolks
+			Beat in: 1/2 cup (100g) granulated sugar, 1/2 cup (120mL) sweet Marsala wine
+			Whisk over steam
+
+			Beat: 1 lb (450g) mascarpone cheese
+			Beat in
+
+			Whip to soft peaks: 1 cup (240mL) heavy cream
+			Fold in
+
+			Dissolve: 2 tsp granulated sugar, 12 oz (355 mL) sweet Marsala wine
+			Soak 2 seconds in: about 40 ladyfinger cookies
+
+			Assemble
+
+			Sift on: 2 Tbs. (11 g) cocoa powder
+
+			Refrigerate 4 hours
+		</code>
+		<code class="chefflow-recipe">
+			Beat: 4 (70 g) large egg yolks
+			Beat in: 1/2 cup (100g) granulated sugar, 1/2 cup (120mL) sweet Marsala wine
+			Whisk over steam
+
+			Beat: 1 lb (450g) mascarpone cheese
+			Beat in
+
+			Whip to soft peaks: 1 cup (240mL) heavy cream
+			Fold in
+
+			Dissolve: 2 tsp granulated sugar, 12 oz (355 mL) sweet Marsala wine
+			Soak 2 seconds in: about 40 ladyfinger cookies
+
+			Assemble
+
+			Sift on: 2 Tbs. (11 g) cocoa powder
+
+			Refrigerate 4 hours
+		</code>
+
+		<code class="chefflow-recipe">
+			Dice &amp; drain: 1-1/2 pounds firm ripe tomatoes
+			Seed &amp; mince: 1 large jalapeno chile
+			Dice: 1/2 cup red onion
+			Mince: 3 garlic cloves
+			Chop: 1/4 cup cilantro leaves
+
+			Combine all with: 1 teaspoon salt, Pinch of ground pepper, 2 tablespoons lime juice
+		</code>
+
+		<code class="chefflow-recipe">
+			Shred finely: 1 oz Parmesan cheese
+			Cut into 4 pieces: 1.25 Tbs butter
+			Boil until al dente: 4 oz fresh pasta
+			Drain, reserve 1/4 cup water
+
+			Combine all with: 1 tbsp salt
+
+			Stir with tongs over low heat for 1 minute
+			Let sit, covered for 1 minute
+			Stir until emulsified
+		</code>
+
+		<code class="chefflow-recipe-eventually">
+				Ingredients
+Crust
+
+    1 9-ounce package chocolate wafer cookies
+    1/2 cup semisweet chocolate chips
+    3 tablespoons sugar
+    7 tablespoons unsalted butter, melted
+
+Filling
+
+    8 large egg yolks
+    1 cup sugar
+    1/4 cup water
+    1/2 teaspoon ground nutmeg
+    1/8 teaspoon ground allspice
+
+    2 cups chilled heavy whipping cream
+    1/2 cup chilled sour cream
+    5 tablespoons Grand Marnier or other orange liqueur
+    3 tablespoons frozen orange juice concentrate, thawed
+    1 tablespoon grated orange peel
+
+Topping
+
+    1/2 cup ruby Port
+    1 tablespoon cornstarch
+    1 cup sugar
+    1/4 cup honey
+    1 teaspoon ground nutmeg
+    1 teaspoon ground allspice
+    1/2 teaspoon ground cinnamon
+    5 cups fresh cranberries or frozen, partially thawed, divided
+
+    White chocolate curls (optional)
+
+crust
+
+Melt: 7 tablespoons unsalted butter
+Finely grind in processor: 	
+1 9-ounce package chocolate wafer cookies
+1/2 cup semisweet chocolate chips
+3 tablespoons sugar
+
+    Finely grind cookies, chips, and sugar in processor. Add melted butter; blend until wet crumbs form. Set aside 1/2 cup crumb mixture. Press remaining crumb mixture onto bottom and 2 inches up sides of 9-inch-diameter springform pan with 2 3/4-inch-high sides.
+
+filling
+
+    Whisk first 3 ingredients in medium metal bowl. Set over saucepan of simmering water and whisk vigorously until candy thermometer registers 175°F, about 8 minutes. Remove bowl from over water. Add spices. Using mixer, beat until thick and cool, about 5 minutes.
+
+    Using electric mixer, beat whipping cream, sour cream, Grand Marnier, orange juice concentrate, and grated orange peel in large bowl until peaks form. Add egg yolk mixture and fold together. Pour 2/3 of filling into crust. Sprinkle with reserved 1/2 cup crumb mixture. Gently spoon remaining filling over. Cover; freeze overnight or up to 3 days.
+
+topping
+
+    Whisk Port and cornstarch in large skillet to blend. Add sugar, honey, and spices. Bring mixture to boil over high heat, stirring often. Add 3 cups cranberries; cook until mixture boils and cranberries begin to pop but still hold shape, about 5 minutes. Mix in remaining 2 cups cranberries. Chill topping at least 6 hours or overnight.
+
+    Release pan sides from torte. Transfer torte to platter. Spoon topping over filling. If desired, garnish torte with white chocolate curls.
+		</code>
+
+		<table>
+			<tr><th>2 Tbs. olive oil</th><td></td><td rowspan=2>saute until aromatic over medium heat (1 min)</td><td rowspan=3>saute until translucent (4-5 min)</td><td rowspan=4>mix in and cook until color deepens (1 min)</td><td rowspan=5>deglaze pan</td><td rowspan=9>simmer, stirring often until vegetables are tender (10-12 min)</td><td rowspan=10>stir in and heat until warm (1 min)</td><td rowspan=12>stir in and take off heat</td><td rowspan=13>season to taste</td></tr>
+			<tr><th>6 cloves garlic</th><td>mince</td></tr>
+			<tr><th>1 medium (200 g) onion</th><td>dice</td><td></td></tr>
+			<tr><th>1 Tbs. (16 g) tomato paste</th><td colspan="3"></td></tr>
+			<tr><th>3/4 cup (180 mL) chicken or vegetable stock</th><td colspan="4"></td></tr>
+			<tr><th>1 large (450 g) eggplant</th><td colspan="5">dice</td></tr>
+			<tr><th>1 medium (140 g) zucchini</th><td colspan="5">quarter &amp; slice</td></tr>
+			<tr><th>5 medium (100 g) brown mushrooms (cremini)</th><td colspan="5">quarter</td></tr>
+			<tr><th>1 medium (150 g) green bell pepper</th><td colspan="5">dice</td></tr>
+			<tr><th>14-1/2 oz. (411 g) can diced tomatoes</th><td>drain</td><td colspan="5"></td></tr>
+			<tr><th>5 sprigs Italian (flat-leaf) parsley</th><td colspan="7">chop</td></tr>
+			<tr><th>4 sprigs Basil</th><td colspan="7">chop</td></tr>
+			<tr><th>salt &amp; pepper</th><td colspan="8"></td></tr>
+		</table>
+	</body>
+</html>
