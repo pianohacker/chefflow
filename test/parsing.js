@@ -14,6 +14,17 @@ function n(text, ...inputs) {
 	}
 }
 
+function stripInternalProperties(nodes) {
+	for (let node of nodes) {
+		for (let prop in node) {
+			if (prop.startsWith('_')) {
+				delete node[prop];
+			}
+		}
+		if (node.inputs) stripInternalProperties(node.inputs);
+	}
+}
+
 describe('parseRecipe', () => {
 	it('should return a list', () => {
 		let nodes = chefflow.parseRecipe('');
@@ -33,8 +44,8 @@ describe('parseRecipe', () => {
 
 		[
 			'ingredients with complex descriptions',
-			'Dice: tomatoes (whole, roasted), onions',
-			n('Dice', 'tomatoes (whole, roasted)', 'onions')
+			'Dice: 1 (12-ounce) can tomatoes (whole, roasted), 4 onions',
+			n('Dice', '1 (12-ounce) can tomatoes (whole, roasted)', '4 onions')
 		],
 
 		[
@@ -60,15 +71,43 @@ describe('parseRecipe', () => {
 				'sugar'
 			),
 		],
+
+		[
+			'different sets of steps',
+			`
+				In a bowl:
+				Beat: eggs
+				Beat in: sugar
+
+				Separately:
+				Chop: onions
+
+				For crust:
+				Cut into pieces: butter
+				Mix in slowly: flour
+			`,
+			n(
+				'Beat in',
+				n('Beat', 'eggs'),
+				'sugar'
+			),
+			n(
+				'Chop',
+				'onions'
+			),
+			n(
+				'Mix in slowly',
+				n('Cut into pieces', 'butter'),
+				'flour'
+			),
+		],
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
 			let nodes = chefflow.parseRecipe(recipeText);
 
-			expect(nodes).to.have.lengthOf(expected.length);
+			stripInternalProperties(nodes);
 
-			for (let i = 0; i < nodes.length; i++) {
-				expect(nodes[i]).to.deep.include(expected[i]);
-			}
+			expect(nodes).to.deep.equal(expected);
 		})
 	});
 })
