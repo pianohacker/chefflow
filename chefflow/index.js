@@ -47,11 +47,11 @@ function parseStep(state, stepContents) {
 function parseNewContext(state, instruction) {
 	let match;
 
-	if ((match = /^for\s+(.*)|^in\s+(.*)/i.exec(instruction))) {
-		state.context = match[1] ? {"for": match[1]} : {"to": match[2]};
+	if ((match = /^for\s+(.*)|^(in|on)\s+(.*)/i.exec(instruction))) {
+		state.context = match[1] ? {for_: match[1]} : {on: match[3]};
 		return true;
-	} else if (/^separately$/i.test(instruction)) {
-		state.context = {separately: true};
+	} else if (/^(meanwhile|separately)$/i.test(instruction)) {
+		state.context = {separate: true};
 		return true;
 	}
 
@@ -60,8 +60,8 @@ function parseNewContext(state, instruction) {
 
 function popMatchingContext(stack, contextDescription) {
 	let contextParts = contextDescription.split(/\s+/);
-	let matchingIndex = stack.findIndex(({_context: {["for"]: for_, to}}) =>
-		partsInSet(contextParts, for_) || partsInSet(contextParts, to)
+	let matchingIndex = stack.findIndex(({_context: {for_, on}}) =>
+		partsInSet(contextParts, for_) || partsInSet(contextParts, on)
 	);
 
 	if (matchingIndex == -1) {

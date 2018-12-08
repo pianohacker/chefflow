@@ -1,5 +1,6 @@
 require('mocha');
-let { expect } = require('chai');
+const { expect } = require('chai');
+const debug = require('debug')('tests');
 
 let chefflow = require('../chefflow');
 
@@ -108,7 +109,7 @@ describe('parseRecipe', () => {
 				In bowl:
 				Beat: eggs
 
-				Separately:
+				Meanwhile:
 				Grate: cheese
 				Mix: into bowl
 			`,
@@ -142,6 +143,7 @@ describe('parseRecipe', () => {
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
 			let nodes = chefflow.parseRecipe(recipeText);
+			debug("Nodes: %o", nodes);
 
 			stripInternalProperties(nodes);
 
