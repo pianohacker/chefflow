@@ -101,6 +101,44 @@ describe('parseRecipe', () => {
 				'flour'
 			),
 		],
+
+		[
+			'connected sets of steps',
+			`
+				In bowl:
+				Beat: eggs
+
+				Separately:
+				Grate: cheese
+				Mix: into bowl
+			`,
+			n(
+				'Mix',
+				n('Beat', 'eggs'),
+				n('Grate', 'cheese'),
+			),
+		],
+
+		[
+			'connected sets of steps with partial description',
+			`
+				In large heatproof bowl:
+				Beat: eggs
+
+				In small dish:
+				Scatter: peppercorns
+
+				Separately:
+				Grate: cheese
+				Mix: into bowl
+			`,
+			n('Scatter', 'peppercorns'),
+			n(
+				'Mix',
+				n('Beat', 'eggs'),
+				n('Grate', 'cheese'),
+			),
+		],
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
 			let nodes = chefflow.parseRecipe(recipeText);
