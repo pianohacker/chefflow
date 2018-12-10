@@ -1,8 +1,6 @@
-require('mocha');
-const { expect } = require('chai');
 const debug = require('debug')('tests');
 
-let parser = require('../chefflow/parser');
+let parser = require('./index.js');
 
 function n(text, ...inputs) {
 	if (inputs.length) {
@@ -140,7 +138,7 @@ describe('parseRecipe', () => {
 
 			stripInternalProperties(nodes);
 
-			expect(nodes).to.deep.equal(expected);
+			expect(nodes).toMatchObject(expected);
 		})
 	});
 })
