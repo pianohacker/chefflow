@@ -1,0 +1,29 @@
+.RecipeTable {
+	border-collapse: collapse;
+	border: thin solid #ccc;
+	margin-top: 1em;
+}
+
+.RecipeTable td, .RecipeTable th {
+	background-size: 100% 100%;
+	border-bottom: thin dotted #ccc;
+	font-weight: normal;
+	text-align: left;
+	padding: .6em 1.75em .6em .5em;
+	position: relative;
+}
+
+.RecipeTable th {
+	padding-left: 1.25em;
+}
+
+.RecipeTable td[rowspan]:not([rowspan="1"]):before {
+	background-image: url(assets/brace.svg);
+	background-size: 100% 100%;
+	content: ' ';
+	height: calc(100% - 1px);
+	left: -1.5em;
+	position: absolute;
+	top: 1px;
+	width: 1.5em;
+}

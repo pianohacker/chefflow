@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import RecipeRenderer from './RecipeRenderer';
+import RecipeDiagram from './RecipeDiagram';
 
 export default class RecipePreview extends Component {
 	constructor(props) {
@@ -14,7 +14,7 @@ export default class RecipePreview extends Component {
 	render() {
 		return <>
 			<textarea onChange={e => this.setState({recipeText: e.target.value})} />
-			<RecipeRenderer recipeText={this.state.recipeText} />
+			<RecipeDiagram recipeText={this.state.recipeText} />
 		</>;
 	}
 }
