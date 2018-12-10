@@ -4,12 +4,12 @@ let parser = require('./index.js');
 
 function n(text, ...inputs) {
 	if (inputs.length) {
-		return new parser.Node({
+		return new parser.RecipeNode({
 			text,
 			inputs: inputs.map(input => typeof input == 'string' ? n(input) : input)
 		});
 	} else {
-		return new parser.Node({ingredient: text});
+		return new parser.RecipeNode({ingredient: text});
 	}
 }
 
@@ -134,7 +134,7 @@ describe('parseRecipe', () => {
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
 			let nodes = parser.parseRecipe(recipeText);
-			debug("Nodes: %o", nodes);
+			debug("RecipeNodes: %o", nodes);
 
 			stripInternalProperties(nodes);
 

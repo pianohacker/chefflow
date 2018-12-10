@@ -1,22 +1,17 @@
-"use strict";
+export function parseRecipe(recipeText) {
+	let state = {
+		stack: [],
+		context: null,
+	};
 
-module.exports = {
-	parseRecipe(recipeText) {
-		let state = {
-			stack: [],
-			context: null,
-		};
+	for (let line of recipeText.split('\n')) {
+		parseStep(state, line);
+	}
 
-		for (let line of recipeText.split('\n')) {
-			parseStep(state, line);
-		}
-
-		return state.stack;
-	},
-	Node,
+	return state.stack;
 };
 
-function Node({text, inputs, ingredient}) {
+export function RecipeNode({text, inputs, ingredient}) {
 	this.text = text;
 	this.inputs = inputs;
 	this.ingredient = ingredient;
@@ -48,10 +43,10 @@ function parseStep(state, stepContents) {
 		inputs.push(...parseIngredients(extra));
 	}
 
-	let result = new Node({text: instruction, inputs});
+	let result = new RecipeNode({text: instruction, inputs});
 	result._context = state.context;
 
-	state.stack.push(result)
+	state.stack.push(result);
 }
 
 function parseNewContext(state, instruction) {
@@ -95,5 +90,5 @@ function partsInSet(parts, string) {
 
 function parseIngredients(ingredients) {
 	return ingredients.split(/,\s+(?![^(]+\))/)
-		.map(ingredient => new Node({ingredient}));
+		.map(ingredient => new RecipeNode({ingredient}));
 }

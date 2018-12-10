@@ -6,7 +6,8 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+	"eqeqeq": "off"
   },
   "dependencies": {
     "react": "^16.6.3",
