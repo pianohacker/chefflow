@@ -27,13 +27,6 @@ function stripInternalProperties(nodes) {
 }
 
 describe('parseRecipe', () => {
-	it('should return a list', () => {
-		let nodes = parser.parseRecipe('');
-
-		expect(nodes).to.be.a('array');
-	});
-
-
 	[
 		[ 'a single step', 'Dice: tomatoes', n('Dice', 'tomatoes') ],
 
