@@ -2,16 +2,16 @@ require('mocha');
 const { expect } = require('chai');
 const debug = require('debug')('tests');
 
-let chefflow = require('../chefflow');
+let parser = require('../chefflow/parser');
 
 function n(text, ...inputs) {
 	if (inputs.length) {
-		return {
+		return new parser.Node({
 			text,
 			inputs: inputs.map(input => typeof input == 'string' ? n(input) : input)
-		};
+		});
 	} else {
-		return {ingredient: text};
+		return new parser.Node({ingredient: text});
 	}
 }
 
@@ -28,7 +28,7 @@ function stripInternalProperties(nodes) {
 
 describe('parseRecipe', () => {
 	it('should return a list', () => {
-		let nodes = chefflow.parseRecipe('');
+		let nodes = parser.parseRecipe('');
 
 		expect(nodes).to.be.a('array');
 	});
@@ -142,7 +142,7 @@ describe('parseRecipe', () => {
 		],
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
-			let nodes = chefflow.parseRecipe(recipeText);
+			let nodes = parser.parseRecipe(recipeText);
 			debug("Nodes: %o", nodes);
 
 			stripInternalProperties(nodes);

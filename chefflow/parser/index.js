@@ -13,7 +13,14 @@ module.exports = {
 
 		return state.stack;
 	},
+	Node,
 };
+
+function Node({text, inputs, ingredient}) {
+	this.text = text;
+	this.inputs = inputs;
+	this.ingredient = ingredient;
+}
 
 function parseStep(state, stepContents) {
 	let match;
@@ -41,7 +48,10 @@ function parseStep(state, stepContents) {
 		inputs.push(...parseIngredients(extra));
 	}
 
-	state.stack.push({text: instruction, inputs, _context: state.context})
+	let result = new Node({text: instruction, inputs});
+	result._context = state.context;
+
+	state.stack.push(result)
 }
 
 function parseNewContext(state, instruction) {
@@ -85,5 +95,5 @@ function partsInSet(parts, string) {
 
 function parseIngredients(ingredients) {
 	return ingredients.split(/,\s+(?![^(]+\))/)
-		.map(ingredient => ({ingredient}));
+		.map(ingredient => new Node({ingredient}));
 }
