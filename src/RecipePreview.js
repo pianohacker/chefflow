@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import * as parser from 'chefflow-parser';
+
+import RecipeRenderer from './RecipeRenderer';
 
 export default class RecipePreview extends Component {
 	constructor(props) {
@@ -13,7 +14,7 @@ export default class RecipePreview extends Component {
 	render() {
 		return <>
 			<textarea onChange={e => this.setState({recipeText: e.target.value})} />
-			<pre style={{width: "100%"}}>{JSON.stringify(parser.parseRecipe(this.state.recipeText), null, 2)}</pre>
+			<RecipeRenderer recipeText={this.state.recipeText} />
 		</>;
 	}
 }
