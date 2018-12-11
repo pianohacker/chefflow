@@ -7,13 +7,22 @@ export default class RecipePreview extends Component {
 		super(props);
 
 		this.state = {
-			recipeText: '',
+			recipeText: window.localStorage['recipe'] || '',
 		};
+	}
+
+	onRecipeTextChanged = e => {
+		let recipeText = e.target.value;
+		this.setState({recipeText});
+
+		setTimeout(1, () => {
+			window.localStorage['recipe'] = recipeText;
+		});
 	}
 
 	render() {
 		return <>
-			<textarea onChange={e => this.setState({recipeText: e.target.value})} />
+			<textarea onChange={this.onRecipeTextChanged} value={this.state.recipeText} />
 			<RecipeDiagram recipeText={this.state.recipeText} />
 		</>;
 	}
