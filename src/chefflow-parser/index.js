@@ -81,8 +81,6 @@ function popMatchingContext(stack, contextDescription) {
 function partsInSet(parts, string) {
 	if (!string) return false;
 
-	debugger;
-
 	let stringSet = new Set(string.split(/\s+/));
 
 	return parts.every(part => stringSet.has(part));
