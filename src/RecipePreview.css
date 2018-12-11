@@ -1,0 +1,14 @@
+.RecipePreview {
+	max-width: 30em;
+	margin: 0 auto;
+}
+
+.RecipePreview textarea {
+	font-family: inherit;
+	padding: .5em;
+	width: 100%;
+}
+
+.RecipePreview .RecipeTable {
+	margin: 2em auto;
+}

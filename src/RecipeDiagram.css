@@ -1,4 +1,5 @@
 .RecipeTable {
+	background: white;
 	border-collapse: collapse;
 	border: thin solid #ccc;
 	margin-top: 1em;

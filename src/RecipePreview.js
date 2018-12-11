@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 
+import TextareaAutosize from 'react-autosize-textarea';
 import RecipeDiagram from './RecipeDiagram';
+
+import './RecipePreview.css';
 
 export default class RecipePreview extends Component {
 	constructor(props) {
@@ -21,9 +24,13 @@ export default class RecipePreview extends Component {
 	}
 
 	render() {
-		return <>
-			<textarea onChange={this.onRecipeTextChanged} value={this.state.recipeText} />
+		return <div className="RecipePreview">
+			<TextareaAutosize
+				onChange={this.onRecipeTextChanged}
+				value={this.state.recipeText}
+				maxRows={10}
+				/>
 			<RecipeDiagram recipeText={this.state.recipeText} />
-		</>;
+		</div>;
 	}
 }

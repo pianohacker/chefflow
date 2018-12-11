@@ -1,7 +1,7 @@
 import React from 'react';
-import * as parser from 'chefflow-parser';
+import * as parser from './chefflow-parser';
 
-import 'RecipeDiagram.css';
+import './RecipeDiagram.css';
 
 export default class RecipeDiagram extends React.PureComponent {
 	render() {
@@ -31,7 +31,13 @@ class RecipeTable extends React.Component {
 							let node;
 							if (!(node = grid[x][y])) return null;
 
-							return <td key={x} rowspan={node.height}>{node.text || node.ingredient}</td>;
+							return <td
+									key={x}
+									colSpan={1}
+									rowSpan={node.height}
+								>
+								{node.text || node.ingredient}
+							</td>;
 						})}
 					</tr>
 				)}
