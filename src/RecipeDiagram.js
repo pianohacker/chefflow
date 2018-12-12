@@ -21,6 +21,20 @@ class RecipeTable extends React.Component {
 
 		for (let laidOutNode of laidOutRecipeNodes) {
 			grid[laidOutNode.x][laidOutNode.y] = laidOutNode;
+
+			for (let fillY of range(laidOutNode.y + 1, laidOutNode.y + laidOutNode.height)) {
+				grid[laidOutNode.x][fillY] = grid[laidOutNode.x][fillY] || true;
+			}
+		}
+
+		for (let laidOutNode of laidOutRecipeNodes) {
+			let nodeWidth = 1;
+			for (let testX of range(laidOutNode.x + 1, width)) {
+				if (grid[testX][laidOutNode.y]) break;
+				nodeWidth++;
+			}
+
+			laidOutNode.width = nodeWidth;
 		}
 
 		return <table className="RecipeTable">
@@ -29,11 +43,11 @@ class RecipeTable extends React.Component {
 					<tr key={y}>
 						{range(width).map(x => {
 							let node;
-							if (!(node = grid[x][y])) return null;
+							if (!(node = grid[x][y]) || node === true) return null;
 
 							return <td
 									key={x}
-									colSpan={1}
+									colSpan={node.width}
 									rowSpan={node.height}
 								>
 								{node.text || node.ingredient}
