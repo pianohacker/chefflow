@@ -7,7 +7,9 @@
   },
   "eslintConfig": {
     "extends": "react-app",
-    "eqeqeq": "off"
+	"rules": {
+		"eqeqeq": "off"
+	}
   },
   "dependencies": {
     "debug": "^4.1.0",
