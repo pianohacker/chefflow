@@ -18,9 +18,9 @@ export default class RecipePreview extends Component {
 		let recipeText = e.target.value;
 		this.setState({recipeText});
 
-		setTimeout(1, () => {
+		setTimeout(() => {
 			window.localStorage['recipe'] = recipeText;
-		});
+		}, 1);
 	}
 
 	render() {
