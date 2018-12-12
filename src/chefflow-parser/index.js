@@ -39,6 +39,10 @@ function parseStep(state, stepContents) {
 		let contextInput = popMatchingContext(state.stack, match[2]);
 
 		inputs.unshift(contextInput);
+
+		if (contextInput._context) {
+			state.context = contextInput._context;
+		}
 	} else if (extra) {
 		inputs.push(...parseIngredients(extra));
 	}

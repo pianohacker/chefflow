@@ -131,6 +131,31 @@ describe('parseRecipe', () => {
 				n('Grate', 'cheese'),
 			),
 		],
+
+		[
+			'multiple combinations',
+			`
+				In bowl:
+				Beat: eggs
+
+				Separately:
+				Grind: salt
+				Sprinkle: in bowl
+
+				Separately:
+				Grind: pepper
+				Sprinkle: in bowl
+			`,
+			n(
+				'Sprinkle',
+				n(
+					'Sprinkle',
+					n('Beat', 'eggs'),
+					n('Grind', 'salt'),
+				),
+				n('Grind', 'pepper'),
+			),
+		],
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
 			let nodes = parser.parseRecipe(recipeText);
