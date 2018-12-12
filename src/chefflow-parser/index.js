@@ -12,9 +12,12 @@ export function parseRecipe(recipeText) {
 };
 
 export function RecipeNode({text, inputs, ingredient}) {
-	this.text = text;
-	this.inputs = inputs;
-	this.ingredient = ingredient;
+	if (ingredient) {
+		this.ingredient = ingredient;
+	} else {
+		this.text = text;
+		this.inputs = inputs;
+	}
 }
 
 function parseStep(state, stepContents) {
@@ -35,8 +38,8 @@ function parseStep(state, stepContents) {
 		inputs.push(state.stack.pop());
 	}
 
-	if ((match = /^in(to)?\s+(.+)/.exec(extra))) {
-		let contextInput = popMatchingContext(state.stack, match[2]);
+	if ((match = /^(in(to)?|on)\s+(.+)/.exec(extra))) {
+		let contextInput = popMatchingContext(state.stack, match[3]);
 
 		inputs.unshift(contextInput);
 
