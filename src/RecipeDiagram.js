@@ -91,7 +91,7 @@ function layoutRecipeNodes(recipeNodes, startY = 0) {
 		laidOutNodes.push({
 			x,
 			y: startY,
-			height: y - startY,
+			height: (y - startY) || 1,
 			text: node.text,
 			ingredient: node.ingredient,
 		});
