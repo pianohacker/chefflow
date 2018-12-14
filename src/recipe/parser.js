@@ -39,7 +39,7 @@ function parseStep(state, stepContents) {
 	}
 
 	if ((match = /^(in(to)?|on)\s+(.+)/.exec(extra))) {
-		let contextInput = popMatchingContext(state.stack, match[3]);
+		let contextInput = popMatchingStep(state.stack, match[3]);
 
 		inputs.unshift(contextInput);
 
@@ -52,6 +52,13 @@ function parseStep(state, stepContents) {
 
 	let result = new RecipeNode({text: instruction, inputs});
 	result._context = state.context;
+
+	let directIngredients = inputs.map(({ingredient}) => ingredient).filter(x => x != null);
+	let indirectIngredientSets = inputs.map(({_ingredients}) => _ingredients).filter(x => x != null);
+	result._ingredients = Array.prototype.concat.apply(
+		directIngredients,
+		indirectIngredientSets,
+	);
 
 	state.stack.push(result);
 }
@@ -70,14 +77,16 @@ function parseNewContext(state, instruction) {
 	return false;
 }
 
-function popMatchingContext(stack, contextDescription) {
-	let contextParts = contextDescription.split(/\s+/);
-	let matchingIndex = stack.findIndex(({_context: {for_, on}}) =>
-		partsInSet(contextParts, for_) || partsInSet(contextParts, on)
+function popMatchingStep(stack, description) {
+	let descriptionParts = description.split(/\s+/);
+	let matchingIndex = stack.findIndex(({_context: {for_, on}, _ingredients = []}) =>
+		partsInSet(descriptionParts, for_) ||
+		partsInSet(descriptionParts, on) ||
+		_ingredients.some(ingredient => partsInSet(descriptionParts, ingredient))
 	);
 
 	if (matchingIndex == -1) {
-		return {error: 'nonexistent context: ' + contextDescription};
+		return {error: 'no previous steps related to: ' + description};
 	}
 
 	let [matchingStep] = stack.splice(matchingIndex, 1);

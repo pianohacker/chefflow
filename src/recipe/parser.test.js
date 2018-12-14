@@ -1,6 +1,6 @@
 const debug = require('debug')('tests');
 
-let parser = require('./index.js');
+let parser = require('./parser');
 
 function n(text, ...inputs) {
 	if (inputs.length) {
@@ -154,6 +154,35 @@ describe('parseRecipe', () => {
 					n('Grind', 'salt'),
 				),
 				n('Grind', 'pepper'),
+			),
+		],
+
+		[
+			'combinations by ingredient',
+			`
+				In bowl:
+				Beat: chicken eggs
+
+				Separately:
+				Grind: salt
+				Sprinkle: on eggs
+
+				In bowl:
+				Sift: flour (all-purpose)
+
+				Separately:
+				Measure: sugar
+				Stir: into flour
+			`,
+			n(
+				'Sprinkle',
+				n('Beat', 'chicken eggs'),
+				n('Grind', 'salt'),
+			),
+			n(
+				'Stir',
+				n('Sift', 'flour (all-purpose)'),
+				n('Measure', 'sugar'),
 			),
 		],
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
-import RecipeDiagram from './RecipeDiagram';
+import RecipeDiagram from './Diagram';
 
-import './RecipePreview.css';
+import './Preview.css';
 
 export default class RecipePreview extends Component {
 	constructor(props) {

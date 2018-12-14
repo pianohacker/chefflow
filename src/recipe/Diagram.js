@@ -1,7 +1,7 @@
 import React from 'react';
-import * as parser from './chefflow-parser';
+import * as parser from './parser';
 
-import './RecipeDiagram.css';
+import './Diagram.css';
 
 export default class RecipeDiagram extends React.PureComponent {
 	render() {

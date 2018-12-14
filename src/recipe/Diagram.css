@@ -19,7 +19,7 @@
 }
 
 .RecipeTable td[rowspan]:not([rowspan="1"]):before {
-	background-image: url(assets/brace.svg);
+	background-image: url(../assets/brace.svg);
 	background-size: 100% 100%;
 	content: ' ';
 	height: calc(100% - 1px);
