@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import moment from 'moment';
 
@@ -7,11 +8,16 @@ import { gapi, driveDownload, driveList, driveUpload } from '../storage/gapi';
 import './Editor.css';
 
 export default class RecipeEditor extends Component {
+	static propTypes = {
+		selectedRecipeId: PropTypes.string,
+	};
+
 	constructor(props) {
 		super(props);
 
 		this.state = {
 			recipeText: '',
+			loading: false,
 			saving: false,
 			savedAt: null,
 			isSignedIn: gapi.auth2.getAuthInstance().isSignedIn.get(),
@@ -28,6 +34,12 @@ export default class RecipeEditor extends Component {
 		this.fetchRecipe();
 	}
 
+	componentDidUpdate({selectedRecipeId}) {
+		if (selectedRecipeId != this.props.selectedRecipeId) {
+			this.fetchRecipe();
+		}
+	}
+
 	onRecipeTextChanged = e => {
 		let recipeText = e.target.value;
 		this.setState({recipeText});
@@ -37,24 +49,15 @@ export default class RecipeEditor extends Component {
 		}, 1);
 	}
 
-	onAuthClick = () => {
-		gapi.auth2.getAuthInstance().signIn();
-	}
-
 	async saveRecipe(recipeText) {
-		if (!this.state.isSignedIn || this.state.saving) return;
+		if (!this.state.isSignedIn || this.state.saving || !this.props.selectedRecipeId) return;
 
 		this.setState({saving: true});
 		
-		let files = await driveList();
-
-		let recipeFile = files.find(file => file.name == 'recipe');
-		let recipeFileId = recipeFile ? recipeFile.id : null;
-
 		try {
-			if (recipeFileId) {
+			if (this.props.selectedRecipeId) {
 				await driveUpload({
-					fileId: recipeFileId,
+					fileId: this.props.selectedRecipeId,
 					metadata: {
 						name: 'recipe',
 					},
@@ -77,14 +80,11 @@ export default class RecipeEditor extends Component {
 	}
 
 	async fetchRecipe() {
-		let files = await driveList();
+		if (!this.state.isSignedIn || this.state.saving || !this.props.selectedRecipeId) return;
 
-		let recipeFile = files.find(file => file.name == 'recipe');
-		let recipeFileId = recipeFile ? recipeFile.id : null;
+		let recipeText = await driveDownload({ fileId: this.props.selectedRecipeId });
 
-		let recipeText = await driveDownload({ fileId: recipeFileId });
-
-		this.setState({ recipeText });
+		this.setState({ recipeText, loading: false });
 	}
 
 	render() {
@@ -94,7 +94,6 @@ export default class RecipeEditor extends Component {
 			<p>
 				{saving && 'Saving...'}
 				{!saving && savedAt && `Saved at ${savedAt.format('LT')}`}
-				{!isSignedIn && <button onClick={this.onAuthClick}>Authorize</button>}
 			</p>
 			<textarea
 				onChange={this.onRecipeTextChanged}

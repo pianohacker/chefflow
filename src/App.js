@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import RecipeEditor from './recipe/Editor';
+import RecipeList from './recipe/List';
 import './App.css';
 
 import { loadGAPI } from './storage/gapi';
@@ -24,7 +25,7 @@ class App extends Component {
 	}
 
 	render() {
-		const { gapi } = this.state;
+		const { gapi, selectedRecipeId } = this.state;
 
 		let contents;
 
@@ -39,7 +40,13 @@ class App extends Component {
 			case 'loaded':
 				contents = <>
 					<header><h1>Chefflow</h1></header>
-					<RecipeEditor />
+					<div>
+						<RecipeList
+							onSelectRecipe={({id}) => this.setState({selectedRecipeId: id})}
+							selectedRecipeId={selectedRecipeId}
+						/>
+						<RecipeEditor selectedRecipeId={selectedRecipeId} />
+					</div>
 				</>;
 				break;
 		}
