@@ -1,8 +1,12 @@
 @import url(https://fonts.googleapis.com/css?family=Rokkitt);
 
+* {
+	box-sizing: border-box;
+}
+
 body {
 	background-image: url(./assets/paper_fibers.png);
-	font: 16px "Rokkitt";
+	font: 18px "Rokkitt";
 	margin: 0;
 	padding: 0;
 }

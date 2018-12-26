@@ -56,15 +56,16 @@ export default class RecipeList extends Component {
 		const { isSignedIn, loading, recipes } = this.state;
 
 		return <div className="RecipeList">
-			<p>
-				{loading && 'Loading...'}
-				{!isSignedIn && <button onClick={this.onAuthClick}>Authorize</button>}
-			</p>
+			<header><h1>Chefflow</h1></header>
 			{!loading && <ul>
 				{recipes.map(recipe => <li key={recipe.id}>
 					<a href="#" onClick={e => this.onSelectRecipe(e, recipe)}>{recipe.name}</a>
 				</li>)}
 			</ul>}
+			<p>
+				{loading && 'Loading...'}
+				{!isSignedIn && <button onClick={this.onAuthClick}>Authorize</button>}
+			</p>
 		</div>;
 	}
 }

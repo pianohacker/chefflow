@@ -13,6 +13,6 @@
 	padding: .5em;
 }
 
-.RecipeEditor .RecipeTable {
-	margin: 2em auto;
+.RecipeEditor .RecipeDiagram {
+	margin: 2em auto 0;
 }

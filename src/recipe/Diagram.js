@@ -9,11 +9,11 @@ export default class RecipeDiagram extends React.PureComponent {
 
 		let [laidOutRecipeNodes, width, height] = layoutRecipeNodes(recipeNodes);
 
-		return <RecipeTable width={width} height={height} laidOutRecipeNodes={laidOutRecipeNodes} />
+		return <RecipeDiagramTable width={width} height={height} laidOutRecipeNodes={laidOutRecipeNodes} />
 	}
 }
 
-class RecipeTable extends React.Component {
+class RecipeDiagramTable extends React.Component {
 	render() {
 		let { width, height, laidOutRecipeNodes } = this.props;
 
@@ -37,7 +37,7 @@ class RecipeTable extends React.Component {
 			laidOutNode.width = nodeWidth;
 		}
 
-		return <table className="RecipeTable">
+		return <table className="RecipeDiagram">
 			<tbody>
 				{range(height).map(y =>
 					<tr key={y}>

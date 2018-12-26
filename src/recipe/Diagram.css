@@ -1,11 +1,11 @@
-.RecipeTable {
+.RecipeDiagram {
 	background: white;
 	border-collapse: collapse;
 	border: thin solid #ccc;
 	margin-top: 1em;
 }
 
-.RecipeTable td, .RecipeTable th {
+.RecipeDiagram td, .RecipeDiagram th {
 	background-size: 100% 100%;
 	border-bottom: thin dotted #ccc;
 	font-weight: normal;
@@ -14,11 +14,11 @@
 	position: relative;
 }
 
-.RecipeTable th {
+.RecipeDiagram th {
 	padding-left: 1.25em;
 }
 
-.RecipeTable td[rowspan]:not([rowspan="1"]):before {
+.RecipeDiagram td[rowspan]:not([rowspan="1"]):before {
 	background-image: url(../assets/brace.svg);
 	background-size: 100% 100%;
 	content: ' ';

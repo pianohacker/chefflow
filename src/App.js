@@ -32,21 +32,22 @@ class App extends Component {
 		switch (gapi) {
 			default:
 			case 'loading':
-				contents = <header><h1>Loading...</h1></header>;
+				contents = <div class="RecipeList">
+					<header><h1>Loading...</h1></header>
+				</div>;
 				break;
 			case 'failed':
-				contents = <header><h1>Failed to load Google APIs</h1></header>;
+				contents = <div class="RecipeList">
+					<header><h1>Failed to load Google APIs</h1></header>
+				</div>;
 				break;
 			case 'loaded':
 				contents = <>
-					<header><h1>Chefflow</h1></header>
-					<div>
-						<RecipeList
-							onSelectRecipe={({id}) => this.setState({selectedRecipeId: id})}
-							selectedRecipeId={selectedRecipeId}
-						/>
-						<RecipeEditor selectedRecipeId={selectedRecipeId} />
-					</div>
+					<RecipeList
+						onSelectRecipe={({id}) => this.setState({selectedRecipeId: id})}
+						selectedRecipeId={selectedRecipeId}
+					/>
+					<RecipeEditor selectedRecipeId={selectedRecipeId} />
 				</>;
 				break;
 		}
