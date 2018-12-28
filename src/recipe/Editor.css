@@ -2,7 +2,7 @@
 	display: flex;
 	flex: 1 0 0px;
 	flex-direction: column;
-	padding: 0 5em;
+	margin: 3rem;
 }
 
 .RecipeEditor textarea {

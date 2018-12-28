@@ -1,3 +1,4 @@
+import moment from 'moment';
 import multipart from '@request/multipart';
 
 export let gapi = {};
@@ -38,14 +39,32 @@ export function loadGAPI({ apiKey, clientId, scopes }) {
 	});
 }
 
+export function driveSignIn(callback) {
+	return gapi.auth2.getAuthInstance().signIn();
+}
+
+export function driveAfterSignIn(callback) {
+	const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn;
+
+	isSignedIn.listen(callback);
+
+	if (isSignedIn.get()) {
+		callback(true);
+	}
+}
+
 export async function driveList() {
 	let { result } = await gapi.client.drive.files.list({
 		spaces: 'appDataFolder',
-		fields: 'files(id, name)',
+		fields: 'files(id, modifiedTime, name)',
 		pageSize: 100,
 	});
 
-	return result.files || [];
+	return (result.files || []).map(file => {
+		file.modifiedTime = moment.utc(file.modifiedTime).local();
+
+		return file;
+	});
 }
 
 export async function driveUpload({ fileId, metadata, contents }) {

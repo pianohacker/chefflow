@@ -1,6 +1,9 @@
 .RecipeList {
+	background: rgba(255, 255, 255, 50%);
+	border-right: thin solid #ccc;
 	flex: 0 1 20em;
-	padding-right: 1.5rem;
+	padding: 3rem;
+	margin-right: 1.5rem;
 	text-align: left;
 }
 
@@ -11,20 +14,32 @@ h1 {
 }
 
 .RecipeList ul {
-	border-top: thin solid #ccc;
+	border-top: thin dotted #ccc;
 	margin: .6em;
 	margin-left: 0;
 	padding: 0;
 }
 
 .RecipeList li {
-	border-bottom: thin solid #ccc;
+	border-bottom: thin dotted #ccc;
 	font-size: 1.5em;
 	list-style-type: none;
 }
 
 .RecipeList a {
+	color: black;
 	display: inline-block;
 	padding: .6rem;
+	text-decoration: none;
 	width: 100%;
+}
+
+.RecipeList-name {
+	text-decoration: underline;
+}
+
+.RecipeList p {
+	color: #444;
+	font-size: 1rem;
+	text-decoration: none;
 }

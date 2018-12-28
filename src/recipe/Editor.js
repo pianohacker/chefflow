@@ -3,13 +3,16 @@ import React, { Component } from 'react';
 import moment from 'moment';
 
 import RecipeDiagram from './Diagram';
-import { gapi, driveDownload, driveList, driveUpload } from '../storage/gapi';
+import { gapi, driveDownload, driveUpload } from '../storage/gapi';
 
 import './Editor.css';
+
+const AUTOSAVE_DELAY_MS = 1000;
 
 export default class RecipeEditor extends Component {
 	static propTypes = {
 		selectedRecipeId: PropTypes.string,
+		onChangeRecipe: PropTypes.func.isRequired,
 	};
 
 	constructor(props) {
@@ -18,8 +21,6 @@ export default class RecipeEditor extends Component {
 		this.state = {
 			recipeText: '',
 			loading: false,
-			saving: false,
-			savedAt: null,
 			isSignedIn: gapi.auth2.getAuthInstance().isSignedIn.get(),
 		};
 	}
@@ -44,16 +45,16 @@ export default class RecipeEditor extends Component {
 		let recipeText = e.target.value;
 		this.setState({recipeText});
 
-		setTimeout(() => {
-			this.saveRecipe(recipeText);
-		}, 1);
+		this.recipeAutosave(recipeText);
 	}
 
-	async saveRecipe(recipeText) {
-		if (!this.state.isSignedIn || this.state.saving || !this.props.selectedRecipeId) return;
+	recipeAutosave = debounce((recipeText) => {
+		this.saveRecipe(recipeText);
+	}, AUTOSAVE_DELAY_MS)
 
-		this.setState({saving: true});
-		
+	async saveRecipe(recipeText) {
+		this.props.onChangeRecipe({saving: true});
+
 		try {
 			if (this.props.selectedRecipeId) {
 				await driveUpload({
@@ -73,7 +74,7 @@ export default class RecipeEditor extends Component {
 				});
 			}
 
-			this.setState({saving: false, savedAt: new moment()});
+			this.props.onChangeRecipe({saving: false, savedAt: new moment()});
 		} catch (err) {
 			console.log('Failed to save recipe:', err);
 		} 
@@ -88,18 +89,27 @@ export default class RecipeEditor extends Component {
 	}
 
 	render() {
-		const { isSignedIn, saving, savedAt } = this.state;
+		const { recipeText } = this.state;
 
 		return <div className="RecipeEditor">
-			<p>
-				{saving && 'Saving...'}
-				{!saving && savedAt && `Saved at ${savedAt.format('LT')}`}
-			</p>
 			<textarea
 				onChange={this.onRecipeTextChanged}
-				value={this.state.recipeText}
+				value={recipeText}
 				/>
-			<RecipeDiagram recipeText={this.state.recipeText} />
+			<RecipeDiagram recipeText={recipeText} />
 		</div>;
 	}
 }
+
+function debounce(func, wait) {
+	let timeout;
+	return function() {
+		let context = this, args = arguments;
+		let later = function() {
+			timeout = null;
+			func.apply(context, args);
+		};
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+	};
+};

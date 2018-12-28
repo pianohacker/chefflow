@@ -2,49 +2,18 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import moment from 'moment';
 
-import { gapi, driveList } from '../storage/gapi';
-
 import './List.css';
 
 export default class RecipeList extends Component {
 	static propTypes = {
+		loading: PropTypes.bool,
+		recipes: PropTypes.arrayOf(PropTypes.shape({
+			id: PropTypes.string,
+			name: PropTypes.string,
+		})),
 		selectedRecipeId: PropTypes.string,
 		onSelectRecipe: PropTypes.func.isRequired,
 	};
-
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			loading: true,
-			saving: false,
-			isSignedIn: gapi.auth2.getAuthInstance().isSignedIn.get(),
-		};
-	}
-
-	componentDidMount() {
-		gapi.auth2.getAuthInstance().isSignedIn.listen(isSignedIn => {
-			this.setState({isSignedIn});
-
-			this.fetchRecipeList();
-		});
-
-		this.fetchRecipeList();
-	}
-
-	onAuthClick = () => {
-		gapi.auth2.getAuthInstance().signIn();
-	}
-
-	async fetchRecipeList() {
-		if (!this.state.isSignedIn) return;
-
-		this.setState({ loading: true });
-
-		let recipes = await driveList();
-
-		this.setState({ loading: false, recipes });
-	}
 
 	onSelectRecipe(e, {id}) {
 		e.preventDefault();
@@ -53,19 +22,29 @@ export default class RecipeList extends Component {
 	}
 
 	render() {
-		const { isSignedIn, loading, recipes } = this.state;
+		const { loading, recipes, selectedRecipeId } = this.props;
 
 		return <div className="RecipeList">
 			<header><h1>Chefflow</h1></header>
 			{!loading && <ul>
 				{recipes.map(recipe => <li key={recipe.id}>
-					<a href="#" onClick={e => this.onSelectRecipe(e, recipe)}>{recipe.name}</a>
+					<a href="#" onClick={e => this.onSelectRecipe(e, recipe)}>
+						<span className="RecipeList-name">{recipe.name}</span>
+						{ recipe.id == selectedRecipeId && <p>
+							{!recipe.saving && !recipe.savedAt && `Last changed ${removeFirstCapital(recipe.modifiedTime.calendar())}`}
+							{recipe.saving && 'Saving...'}
+							{!recipe.saving && recipe.savedAt && `Saved ${removeFirstCapital(recipe.savedAt.calendar())}`}
+						</p> }
+					</a>
 				</li>)}
 			</ul>}
 			<p>
 				{loading && 'Loading...'}
-				{!isSignedIn && <button onClick={this.onAuthClick}>Authorize</button>}
 			</p>
 		</div>;
 	}
+}
+
+function removeFirstCapital(string) {
+	return string[0].toLowerCase() + string.slice(1);
 }
