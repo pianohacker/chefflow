@@ -21,37 +21,37 @@ class RecipeEditor extends Component {
 		super(props);
 
 		this.state = {
-			recipeName: '',
-			recipeText: '',
+			recipe: {
+				name: '',
+				body: '',
+			},
 		};
 	}
 
-	componentDidUpdate(prevProps) {
-		if (this.props == prevProps || !this.props.recipe) return;
-
-		const { selectedRecipeId: prevSelectedRecipeId, recipe: prevRecipe } = prevProps;
-
-		if (prevSelectedRecipeId == this.props.selectedRecipeId) {
-			if (this.props.recipe && this.props.recipe != prevRecipe) {
-				this.setState({
+	static getDerivedStateFromProps(
+		{ selectedRecipeId, recipe, dispatch },
+		{ selectedRecipeId: prevSelectedRecipeId, recipe: prevRecipe, loading }
+	) {
+		if (prevSelectedRecipeId == selectedRecipeId) {
+			if (recipe && recipe != prevRecipe) {
+				return {
 					loading: false,
-					recipeName: this.props.recipe.name,
-					recipeText: this.props.recipe.body,
-				});
+					recipe,
+				};
 			}
-		} else {
-			this.setState({
-				loading: true,
-				recipeName: '',
-				recipeText: '',
-			});
-
-			this.props.dispatch({ 
+		} else if (!loading) {
+			dispatch({
 				type: 'DRIVE_DOWNLOAD_REQUESTED',
 				payload: {
-					fileId: this.props.recipe.id,
+					fileId: selectedRecipeId,
 				},
 			});
+
+			return {
+				selectedRecipeId,
+				loading: true,
+				recipe: {},
+			}
 		}
 	}
 
@@ -108,19 +108,25 @@ class RecipeEditor extends Component {
 	}
 
 	render() {
-		const { recipeName, recipeText } = this.state;
+		const { loading, recipe: { name, body } } = this.state;
+
+		if (loading) {
+			return <div className="RecipeEditor">
+				<p>Loading...</p>
+			</div>;
+		}
 
 		return <div className="RecipeEditor">
 			<input
 				className="RecipeEditor-nameEntry" 
 				onChange={this.onRecipeNameChanged}
-				value={recipeName}
+				value={name}
 				/>
 			<textarea
 				onChange={this.onRecipeTextChanged}
-				value={recipeText}
+				value={body}
 				/>
-			<RecipeDiagram recipeText={recipeText} />
+			<RecipeDiagram recipeText={body} />
 		</div>;
 	}
 }

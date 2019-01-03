@@ -28,9 +28,12 @@ class App extends Component {
 					onSelectRecipe={({id}) => this.setState({selectedRecipeId: id})}
 					selectedRecipeId={selectedRecipeId}
 				/>
-				<RecipeEditor
-					selectedRecipeId={selectedRecipeId}
-				/>
+				{
+					selectedRecipeId != null &&
+					<RecipeEditor
+						selectedRecipeId={selectedRecipeId}
+					/>
+				}
 			</>;
 		}
 
