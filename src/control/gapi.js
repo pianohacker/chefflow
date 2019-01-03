@@ -6,6 +6,7 @@ import {
 import {
 	all,
 	call,
+	debounce,
 	fork,
 	put,
 	take,
@@ -24,6 +25,9 @@ const _SCOPES = [
 	'https://www.googleapis.com/auth/drive.appdata',
 	'https://www.googleapis.com/auth/drive.file',
 ];
+
+const _AUTOSAVE_DELAY_MS = 1000;
+const _FILE_FIELDS = 'files(id, modifiedTime, name)';
 
 function putAction(type, payload) {
 	return put({ type, payload });
@@ -103,14 +107,15 @@ function* gapiDriveSaga() {
 
 	yield all([
 		takeEvery('DRIVE_DOWNLOAD_REQUESTED', driveDownloadSaga),
-		takeEvery('DRIVE_UPLOAD_REQUESTED', driveUploadSaga),
+		debounce(_AUTOSAVE_DELAY_MS, 'DRIVE_UPLOAD_REQUESTED', driveUploadSaga),
+		takeEvery('DRIVE_NEW_REQUESTED', driveNewSaga),
 	]);
 }
 
 async function driveList() {
 	let { result } = await gapi.client.drive.files.list({
 		spaces: 'appDataFolder',
-		fields: 'files(id, modifiedTime, name)',
+		fields: _FILE_FIELDS,
 		pageSize: 100,
 	});
 
@@ -130,7 +135,36 @@ function* driveDownloadSaga({ payload: { fileId } }) {
 	yield putAction('DRIVE_DOWNLOAD_FINISHED', { fileId, body });
 }
 
-function* driveUploadSaga({ payload: { fileId, metadata, contents } }) {
+function* driveNewSaga() {
+	yield call(driveUploadSaga,
+		{
+			payload: {
+				metadata: {
+					parents: ['appDataFolder'],
+				},
+			},
+		},
+		{
+			started: 'DRIVE_NEW_STARTED',
+			finished: 'DRIVE_NEW_FINISHED',
+		},
+	)
+}
+
+function* driveUploadSaga(
+	{
+		payload: { fileId, metadata, contents },
+	},
+	{
+		started,
+		finished,
+	} = {
+		started: 'DRIVE_UPLOAD_STARTED',
+		finished: 'DRIVE_UPLOAD_FINISHED',
+	},
+) {
+	yield putAction(started, { fileId, metadata });
+
 	let { body, contentType } = multipart({
 		multipart: [
 			{
@@ -152,7 +186,7 @@ function* driveUploadSaga({ payload: { fileId, metadata, contents } }) {
 		body.on('end', resolve);
 	}));
 
-	yield call(gapi.client.request, {
+	let { result } = yield call(gapi.client.request, {
 		'path': '/upload/drive/v3/files' + (fileId ? `/${fileId}` : ''),
 		'method': fileId ? 'PATCH' : 'POST',
 		'params': {'uploadType': 'multipart'},
@@ -162,5 +196,5 @@ function* driveUploadSaga({ payload: { fileId, metadata, contents } }) {
 		'body': multipartRequestBody
 	});
 
-	yield putAction('DRIVE_UPLOAD_FINISHED', { fileId });
+	yield putAction(finished, { fileId, metadata, result });
 }

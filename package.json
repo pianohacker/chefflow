@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject"
   },
   "eslintConfig": {
     "extends": "react-app",
@@ -12,16 +12,19 @@
     }
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.6.3",
     "@request/multipart": "^0.1.1",
+    "customize-cra": "^0.2.9",
     "debug": "^4.1.0",
     "moment": "^2.23.0",
     "prop-types": "^15.6.2",
     "react": "^16.6.3",
+    "react-app-rewired": "^2.0.2",
     "react-dom": "^16.6.3",
     "react-redux": "^6.0.0",
     "react-scripts": "2.1.1",
     "redux": "^4.0.1",
-    "redux-saga": "^0.16.2"
+    "redux-saga": "^1"
   },
   "browserslist": [
     ">0.2%",

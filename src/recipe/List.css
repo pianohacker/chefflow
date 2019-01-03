@@ -1,7 +1,9 @@
 .RecipeList {
 	background: rgba(255, 255, 255, 50%);
 	border-right: thin solid #ccc;
+	display: flex;
 	flex: 0 1 20em;
+	flex-direction: column;
 	padding: 3rem;
 	margin-right: 1.5rem;
 	text-align: left;
@@ -15,6 +17,7 @@ h1 {
 
 .RecipeList ul {
 	border-top: thin dotted #ccc;
+	flex: 1 0 0px;
 	margin: .6em;
 	margin-left: 0;
 	padding: 0;
@@ -40,6 +43,7 @@ h1 {
 
 .RecipeList p {
 	color: #444;
+	flex: 1 0 0px;
 	font-size: 1rem;
 	text-decoration: none;
 }

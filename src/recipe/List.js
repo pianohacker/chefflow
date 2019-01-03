@@ -20,6 +20,12 @@ class RecipeList extends Component {
 		this.props.onSelectRecipe({id});
 	}
 
+	onNewRecipe = e => {
+		e.preventDefault();
+
+		this.props.dispatch({type: 'DRIVE_NEW_REQUESTED'});
+	}
+
 	render() {
 		const { loading, recipes, selectedRecipeId } = this.props;
 
@@ -28,7 +34,7 @@ class RecipeList extends Component {
 			{!loading && <ul>
 				{recipes.map(recipe => <li key={recipe.id}>
 					<a href="#" onClick={e => this.onSelectRecipe(e, recipe)}>
-						<span className="RecipeList-name">{recipe.name}</span>
+						<span className="RecipeList-name">{recipe.name || 'Untitled'}</span>
 						{ recipe.id == selectedRecipeId && <p>
 							{!recipe.saving && !recipe.savedAt && `Last changed ${removeFirstCapital(recipe.modifiedTime.calendar())}`}
 							{recipe.saving && 'Saving...'}
@@ -40,6 +46,9 @@ class RecipeList extends Component {
 			<p>
 				{loading && 'Loading...'}
 			</p>
+			<footer>
+				<button onClick={this.onNewRecipe}><i className="fas fa-plus" /> New Recipe</button>
+			</footer>
 		</div>;
 	}
 }
