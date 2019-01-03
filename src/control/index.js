@@ -29,6 +29,12 @@ function recipes(state = [], {type, payload}) {
 	switch (type) {
 		case 'DRIVE_FILES_FETCHED':
 			return payload.files;
+		case 'DRIVE_UPLOAD_REQUESTED':
+			return extendAtMatch(
+				state,
+				file => file.id == payload.fileId,
+				{ name: payload.metadata.name },
+			);
 		case 'DRIVE_DOWNLOAD_FINISHED':
 			return extendAtMatch(
 				state,

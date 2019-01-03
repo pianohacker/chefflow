@@ -13,7 +13,7 @@ class App extends Component {
 	}
 
 	render() {
-		const { gapi, recipes } = this.props;
+		const { gapi } = this.props;
 		const { selectedRecipeId } = this.state;
 
 		let contents;
@@ -25,12 +25,11 @@ class App extends Component {
 		} else {
 			contents = <>
 				<RecipeList
-					recipes={recipes}
 					onSelectRecipe={({id}) => this.setState({selectedRecipeId: id})}
 					selectedRecipeId={selectedRecipeId}
 				/>
 				<RecipeEditor
-					recipe={recipes.find(recipe => recipe.id == selectedRecipeId)}
+					selectedRecipeId={selectedRecipeId}
 				/>
 			</>;
 		}
@@ -44,5 +43,5 @@ class App extends Component {
 }
 
 export default connect(
-	({ gapi, recipes }) => ({ gapi, recipes }),
+	({ gapi }) => ({ gapi }),
 )(App);

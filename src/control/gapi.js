@@ -121,7 +121,7 @@ async function driveList() {
 	});
 }
 
-function* driveDownloadSaga({ fileId }) {
+function* driveDownloadSaga({ payload: { fileId } }) {
 	let { body } = yield call(gapi.client.drive.files.get, {
 		fileId,
 		alt: 'media',
@@ -130,7 +130,7 @@ function* driveDownloadSaga({ fileId }) {
 	yield putAction('DRIVE_DOWNLOAD_FINISHED', { fileId, body });
 }
 
-function* driveUploadSaga({ fileId, metadata, contents }) {
+function* driveUploadSaga({ payload: { fileId, metadata, contents } }) {
 	let { body, contentType } = multipart({
 		multipart: [
 			{

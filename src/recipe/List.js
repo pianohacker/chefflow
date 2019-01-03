@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import './List.css';
 
-export default class RecipeList extends Component {
+class RecipeList extends Component {
 	static propTypes = {
 		recipes: PropTypes.arrayOf(PropTypes.shape({
 			id: PropTypes.string,
@@ -42,6 +43,8 @@ export default class RecipeList extends Component {
 		</div>;
 	}
 }
+
+export default connect(({ recipes }) => ({ recipes }))(RecipeList);
 
 function removeFirstCapital(string) {
 	return string[0].toLowerCase() + string.slice(1);

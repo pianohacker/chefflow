@@ -5,6 +5,14 @@
 	margin: 3rem;
 }
 
+.RecipeEditor-nameEntry {
+	font: inherit;
+	font-size: 1.5rem;
+	margin: 0 auto;
+	margin-bottom: 1rem;
+	width: 30rem;
+}
+
 .RecipeEditor textarea {
 	flex: 1 0 0px;
 	font-family: inherit;
