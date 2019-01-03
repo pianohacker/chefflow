@@ -1,18 +1,20 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import moment from 'moment';
+import { connect } from 'react-redux';
 
 import RecipeDiagram from './Diagram';
-import { gapi, driveDownload, driveUpload } from '../storage/gapi';
 
 import './Editor.css';
 
 const AUTOSAVE_DELAY_MS = 1000;
 
-export default class RecipeEditor extends Component {
+class RecipeEditor extends Component {
 	static propTypes = {
-		selectedRecipeId: PropTypes.string,
-		onChangeRecipe: PropTypes.func.isRequired,
+		recipe: PropTypes.shape({
+			id: PropTypes.string,
+			name: PropTypes.string,
+			body: PropTypes.body,
+		}),
 	};
 
 	constructor(props) {
@@ -20,24 +22,25 @@ export default class RecipeEditor extends Component {
 
 		this.state = {
 			recipeText: '',
-			loading: false,
-			isSignedIn: gapi.auth2.getAuthInstance().isSignedIn.get(),
 		};
 	}
 
-	componentDidMount() {
-		gapi.auth2.getAuthInstance().isSignedIn.listen(isSignedIn => {
-			this.setState({isSignedIn});
+	componentDidUpdate(prevProps) {
+		if (this.props == prevProps || !this.props.recipe) return;
 
-			this.fetchRecipe();
-		});
+		const {recipe: { id: prevSelectedRecipeId } = { id: null }} = prevProps;
 
-		this.fetchRecipe();
-	}
+		if (prevSelectedRecipeId == this.props.recipe.id) {
+			if (this.props.recipe.body && this.props.recipe.body != this.state.recipeText) {
+				this.setState({ loading: false, recipeText: this.props.recipe.body });
+			}
+		} else {
+			this.setState({ loading: true, recipeText: '' });
 
-	componentDidUpdate({selectedRecipeId}) {
-		if (selectedRecipeId != this.props.selectedRecipeId) {
-			this.fetchRecipe();
+			this.props.dispatch({ 
+				type: 'DRIVE_DOWNLOAD_REQUESTED',
+				fileId: this.props.recipe.id,
+			});
 		}
 	}
 
@@ -52,20 +55,20 @@ export default class RecipeEditor extends Component {
 		this.saveRecipe(recipeText);
 	}, AUTOSAVE_DELAY_MS)
 
-	async saveRecipe(recipeText) {
-		this.props.onChangeRecipe({saving: true});
-
+	saveRecipe(recipeText) {
 		try {
-			if (this.props.selectedRecipeId) {
-				await driveUpload({
-					fileId: this.props.selectedRecipeId,
+			if (this.props.recipe) {
+				this.props.dispatch({
+					type: 'DRIVE_UPLOAD_REQUESTED', 
+					fileId: this.props.recipe.id,
 					metadata: {
 						name: 'recipe',
 					},
 					contents: recipeText,
 				});
 			} else {
-				await driveUpload({
+				this.props.dispatch({
+					type: 'DRIVE_UPLOAD_REQUESTED', 
 					metadata: {
 						name: 'recipe',
 						parents: ['appDataFolder'],
@@ -73,19 +76,9 @@ export default class RecipeEditor extends Component {
 					contents: recipeText,
 				});
 			}
-
-			this.props.onChangeRecipe({saving: false, savedAt: new moment()});
 		} catch (err) {
 			console.log('Failed to save recipe:', err);
 		} 
-	}
-
-	async fetchRecipe() {
-		if (!this.state.isSignedIn || this.state.saving || !this.props.selectedRecipeId) return;
-
-		let recipeText = await driveDownload({ fileId: this.props.selectedRecipeId });
-
-		this.setState({ recipeText, loading: false });
 	}
 
 	render() {
@@ -100,6 +93,8 @@ export default class RecipeEditor extends Component {
 		</div>;
 	}
 }
+
+export default connect()(RecipeEditor);
 
 function debounce(func, wait) {
 	let timeout;

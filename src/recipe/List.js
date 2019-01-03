@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import moment from 'moment';
 
 import './List.css';
 
 export default class RecipeList extends Component {
 	static propTypes = {
-		loading: PropTypes.bool,
 		recipes: PropTypes.arrayOf(PropTypes.shape({
 			id: PropTypes.string,
 			name: PropTypes.string,
