@@ -12,6 +12,12 @@ class App extends Component {
 		this.props.dispatch('GAPI_SIGN_IN_REQUESTED');
 	}
 
+	onNewRecipe = e => {
+		e.preventDefault();
+
+		this.props.dispatch({type: 'DRIVE_NEW_REQUESTED'});
+	}
+
 	render() {
 		const { gapi } = this.props;
 		const { selectedRecipeId } = this.state;
@@ -19,15 +25,26 @@ class App extends Component {
 		let contents;
 
 		if (gapi.loading) {
-			contents = <div className="RecipeList">
+			contents = <div className="App-sidebar">
 				<header><h1>Loading...</h1></header>
 			</div>;
 		} else {
 			contents = <>
-				<RecipeList
-					onSelectRecipe={({id}) => this.setState({selectedRecipeId: id})}
-					selectedRecipeId={selectedRecipeId}
-				/>
+				<div className="App-sidebar">
+					<header><h1>Chefflow</h1></header>
+					<RecipeList
+						onSelectRecipe={({id}) => this.setState({selectedRecipeId: id})}
+						selectedRecipeId={selectedRecipeId}
+					/>
+					<footer>
+						{ gapi.signedIn &&
+							<button onClick={this.onNewRecipe}><i className="fas fa-plus" /> New Recipe</button>
+						}
+						{ !gapi.signedIn &&
+							<button onClick={this.onAuthClick}><i className="fab fa-google-drive" /> Sign in to Google</button>
+						}
+					</footer>
+				</div>
 				{
 					selectedRecipeId != null &&
 					<RecipeEditor

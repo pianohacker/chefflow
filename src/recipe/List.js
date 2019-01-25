@@ -20,36 +20,22 @@ class RecipeList extends Component {
 		this.props.onSelectRecipe({id});
 	}
 
-	onNewRecipe = e => {
-		e.preventDefault();
-
-		this.props.dispatch({type: 'DRIVE_NEW_REQUESTED'});
-	}
-
 	render() {
 		const { loading, recipes, selectedRecipeId } = this.props;
 
-		return <div className="RecipeList">
-			<header><h1>Chefflow</h1></header>
-			{!loading && <ul>
-				{recipes.map(recipe => <li key={recipe.id}>
-					<a href="#" onClick={e => this.onSelectRecipe(e, recipe)}>
-						<span className="RecipeList-name">{recipe.name || 'Untitled'}</span>
-						{ recipe.id == selectedRecipeId && <p>
-							{!recipe.saving && !recipe.savedAt && `Last changed ${removeFirstCapital(recipe.modifiedTime.calendar())}`}
-							{recipe.saving && 'Saving...'}
-							{!recipe.saving && recipe.savedAt && `Saved ${removeFirstCapital(recipe.savedAt.calendar())}`}
-						</p> }
-					</a>
-				</li>)}
-			</ul>}
-			<p>
-				{loading && 'Loading...'}
-			</p>
-			<footer>
-				<button onClick={this.onNewRecipe}><i className="fas fa-plus" /> New Recipe</button>
-			</footer>
-		</div>;
+		return <ul class="RecipeList">
+			{loading && <li>Loading</li>}
+			{!loading && recipes.map(recipe => <li key={recipe.id}>
+				<a href="#" onClick={e => this.onSelectRecipe(e, recipe)}>
+					<span className="RecipeList-name">{recipe.name || 'Untitled'}</span>
+					{ recipe.id == selectedRecipeId && <p>
+						{!recipe.saving && !recipe.savedAt && `Last changed ${removeFirstCapital(recipe.modifiedTime.calendar())}`}
+						{recipe.saving && 'Saving...'}
+						{!recipe.saving && recipe.savedAt && `Saved ${removeFirstCapital(recipe.savedAt.calendar())}`}
+					</p> }
+				</a>
+			</li>)}
+		</ul>;
 	}
 }
 

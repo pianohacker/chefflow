@@ -3,3 +3,28 @@
 	height: 100vh;
 	text-align: center;
 }
+
+.App-sidebar {
+	background: rgba(255, 255, 255, 50%);
+	border-right: thin solid #ccc;
+	display: flex;
+	flex: 0 1 20em;
+	flex-direction: column;
+	padding: 3rem;
+	margin-right: 1.5rem;
+	text-align: left;
+}
+
+h1 {
+	font-size: 2.25em;
+	margin: 0;
+	margin-bottom: 1.5rem;
+}
+
+.App-sidebar footer {
+	display: flex;
+}
+
+.App-sidebar footer button {
+	flex: 1 0 0px;
+}
