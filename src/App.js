@@ -9,7 +9,7 @@ class App extends Component {
 	state = {};
 
 	onAuthClick = () => {
-		this.props.dispatch('GAPI_SIGN_IN_REQUESTED');
+		this.props.dispatch({type: 'GAPI_SIGN_IN_REQUESTED'});
 	}
 
 	onNewRecipe = e => {
@@ -37,10 +37,10 @@ class App extends Component {
 						selectedRecipeId={selectedRecipeId}
 					/>
 					<footer>
-						{ gapi.signedIn &&
+						{ gapi.signedIn && 
 							<button onClick={this.onNewRecipe}><i className="fas fa-plus" /> New Recipe</button>
 						}
-						{ !gapi.signedIn &&
+						{ !gapi.signedIn && 
 							<button onClick={this.onAuthClick}><i className="fab fa-google-drive" /> Sign in to Google</button>
 						}
 					</footer>
