@@ -1,7 +1,39 @@
 import React from 'react';
-import * as parser from './parser';
+import styled from 'styled-components';
 
-import './Diagram.css';
+import * as parser from './parser';
+import braceImage from '../assets/brace.svg';
+
+const StyledRecipeDiagram = styled.table`
+	background: white;
+	border-collapse: collapse;
+	border: thin solid #ccc;
+	margin: 2em auto 0;
+`;
+
+const RecipeCell = styled.td`
+	background-size: 100% 100%;
+	border-bottom: thin dotted #ccc;
+	font-weight: normal;
+	text-align: left;
+	padding: .6em 1.75em .6em .5em;
+	position: relative;
+
+	&[rowspan]:not([rowspan="1"]):before {
+		background-image: url(${braceImage});
+		background-size: 100% 100%;
+		content: ' ';
+		height: calc(100% - 1px);
+		left: -1.5em;
+		position: absolute;
+		top: 1px;
+		width: 1.5em;
+	}
+`;
+
+const RecipeIngredient = styled(RecipeCell)`
+	padding-left: 1.25em;
+`;
 
 export default class RecipeDiagram extends React.PureComponent {
 	render() {
@@ -37,7 +69,7 @@ class RecipeDiagramTable extends React.Component {
 			laidOutNode.width = nodeWidth;
 		}
 
-		return <table className="RecipeDiagram">
+		return <StyledRecipeDiagram>
 			<tbody>
 				{range(height).map(y =>
 					<tr key={y}>
@@ -45,18 +77,20 @@ class RecipeDiagramTable extends React.Component {
 							let node;
 							if (!(node = grid[x][y]) || node === true) return null;
 
-							return <td
+							const Component = node.ingredient ? RecipeIngredient : RecipeCell;
+
+							return <Component
 									key={x}
 									colSpan={node.width}
 									rowSpan={node.height}
 								>
 								{node.text || node.ingredient}
-							</td>;
+							</Component>;
 						})}
 					</tr>
 				)}
 			</tbody>
-		</table>;
+		</StyledRecipeDiagram>;
 	}
 }
 

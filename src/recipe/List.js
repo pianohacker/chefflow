@@ -1,8 +1,40 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 
-import './List.css';
+const StyledRecipeList = styled.ul`
+	border-top: thin dotted #ccc;
+	flex: 1 0 0px;
+	margin: .6em;
+	margin-left: 0;
+	padding: 0;
+`;
+
+const RecipeItem = styled.li`
+	border-bottom: thin dotted #ccc;
+	font-size: 1.5em;
+	list-style-type: none;
+`;
+
+const RecipeLink = styled.a`
+	color: black;
+	display: inline-block;
+	padding: .6rem;
+	text-decoration: none;
+	width: 100%;
+`;
+
+const RecipeName = styled.span`
+	text-decoration: underline;
+`;
+
+const RecipeDescription = styled.p`
+	color: #444;
+	flex: 1 0 0px;
+	font-size: 1rem;
+	text-decoration: none;
+`;
 
 class RecipeList extends Component {
 	static propTypes = {
@@ -23,19 +55,19 @@ class RecipeList extends Component {
 	render() {
 		const { loading, recipes, selectedRecipeId } = this.props;
 
-		return <ul class="RecipeList">
+		return <StyledRecipeList>
 			{loading && <li>Loading</li>}
-			{!loading && recipes.map(recipe => <li key={recipe.id}>
-				<a href="#" onClick={e => this.onSelectRecipe(e, recipe)}>
-					<span className="RecipeList-name">{recipe.name || 'Untitled'}</span>
-					{ recipe.id == selectedRecipeId && <p>
+			{!loading && recipes.map(recipe => <RecipeItem key={recipe.id}>
+				<RecipeLink href="#" onClick={e => this.onSelectRecipe(e, recipe)}>
+					<RecipeName>{recipe.name || 'Untitled'}</RecipeName>
+					{ recipe.id == selectedRecipeId && <RecipeDescription>
 						{!recipe.saving && !recipe.savedAt && `Last changed ${removeFirstCapital(recipe.modifiedTime.calendar())}`}
 						{recipe.saving && 'Saving...'}
 						{!recipe.saving && recipe.savedAt && `Saved ${removeFirstCapital(recipe.savedAt.calendar())}`}
-					</p> }
-				</a>
-			</li>)}
-		</ul>;
+					</RecipeDescription> }
+				</RecipeLink>
+			</RecipeItem>)}
+		</StyledRecipeList>;
 	}
 }
 

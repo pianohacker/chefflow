@@ -1,10 +1,32 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 
 import RecipeDiagram from './Diagram';
 
-import './Editor.css';
+const StyledRecipeEditor = styled.div`
+	display: flex;
+	flex: 1 0 0px;
+	flex-direction: column;
+	margin: 3rem;
+`;
+
+const NameEntry = styled.input`
+	font: inherit;
+	font-size: 1.5rem;
+	margin: 0 auto;
+	margin-bottom: 1rem;
+	width: 30rem;
+`;
+
+const Textarea = styled.textarea`
+	flex: 1 0 0px;
+	font-family: inherit;
+	width: 30em;
+	margin: 0 auto;
+	padding: .5em;
+`;
 
 class RecipeEditor extends Component {
 	static propTypes = {
@@ -108,18 +130,17 @@ class RecipeEditor extends Component {
 
 		const { recipe: { name, body } } = this.state;
 
-		return <div className="RecipeEditor">
-			<input
-				className="RecipeEditor-nameEntry" 
+		return <StyledRecipeEditor>
+			<NameEntry
 				onChange={this.onRecipeNameChanged}
 				value={name}
 				/>
-			<textarea
+			<Textarea
 				onChange={this.onRecipeBodyChanged}
 				value={body || ''}
 				/>
 			<RecipeDiagram recipeText={body} />
-		</div>;
+		</StyledRecipeEditor>;
 	}
 }
 
