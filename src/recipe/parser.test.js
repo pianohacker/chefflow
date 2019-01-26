@@ -133,6 +133,39 @@ describe('parseRecipe', () => {
 		],
 
 		[
+			'context with spaces after',
+			`
+				In bowl:
+				Beat: eggs
+
+				Meanwhile:
+				Grate: cheese
+				Mix: into bowl `,
+			n(
+				'Mix',
+				n('Beat', 'eggs'),
+				n('Grate', 'cheese'),
+			),
+		],
+
+		[
+			'context creation with spaces after',
+			`
+				In bowl :
+				Beat: eggs
+
+				Meanwhile:
+				Grate: cheese
+				Mix: into bowl
+			`,
+			n(
+				'Mix',
+				n('Beat', 'eggs'),
+				n('Grate', 'cheese'),
+			),
+		],
+
+		[
 			'multiple combinations',
 			`
 				In bowl:

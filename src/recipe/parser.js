@@ -78,7 +78,7 @@ function parseNewContext(state, instruction) {
 }
 
 function popMatchingStep(stack, description) {
-	let descriptionParts = description.split(/\s+/);
+	let descriptionParts = description.trim().split(/\s+/);
 	let matchingIndex = stack.findIndex(({_context: {for_, on}, _ingredients = []}) =>
 		partsInSet(descriptionParts, for_) ||
 		partsInSet(descriptionParts, on) ||
