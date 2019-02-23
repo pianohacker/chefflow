@@ -4,12 +4,12 @@ let parser = require('./markdown-parser');
 
 function n(text, ...inputs) {
 	if (inputs.length) {
-		return new parser.RecipeNode({
+		return ({
 			text,
 			inputs: inputs.map(input => typeof input == 'string' ? n(input) : input)
 		});
 	} else {
-		return new parser.RecipeNode({ingredient: text});
+		return ({ingredient: text});
 	}
 }
 
@@ -140,7 +140,7 @@ describe('parseRecipe', () => {
 
 				Meanwhile:
 				- Grate *cheese*
-				Mix: *into bowl *
+				- Mix *into bowl *
 			`,
 			n(
 				'Mix',
@@ -153,11 +153,11 @@ describe('parseRecipe', () => {
 			'context creation with spaces after',
 			`
 				In bowl :
-				Beat: eggs
+				- Beat *eggs*
 
 				Meanwhile:
-				Grate: cheese
-				Mix: into bowl
+				- Grate *cheese*
+				- Mix *into bowl*
 			`,
 			n(
 				'Mix',
@@ -201,7 +201,7 @@ describe('parseRecipe', () => {
 				- Grind *salt*
 				- Sprinkle *on eggs*
 
-				In bowl:
+				In small bowl:
 				- Sift *flour (all-purpose)*
 
 				Separately:
@@ -221,7 +221,7 @@ describe('parseRecipe', () => {
 		],
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
-			let nodes = parser.parseRecipe(recipeText);
+			let nodes = parser.parseRecipe(recipeText.replace(/^\t+/gm, ''));
 			debug("RecipeNodes: %o", nodes);
 
 			stripInternalProperties(nodes);
