@@ -12,8 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
-	"types": ["node", "react", "@paperist/types-remark"]
+    "jsx": "preserve"
   },
   "include": [
     "src"

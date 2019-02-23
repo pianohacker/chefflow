@@ -4,12 +4,12 @@ let parser = require('./parser');
 
 function n(text, ...inputs) {
 	if (inputs.length) {
-		return new parser.RecipeNode({
+		return ({
 			text,
 			inputs: inputs.map(input => typeof input == 'string' ? n(input) : input)
 		});
 	} else {
-		return new parser.RecipeNode({ingredient: text});
+		return ({ingredient: text});
 	}
 }
 
@@ -26,25 +26,25 @@ function stripInternalProperties(nodes) {
 
 describe('parseRecipe', () => {
 	[
-		[ 'a single step', 'Dice: tomatoes', n('Dice', 'tomatoes') ],
+		[ 'a single step', '- Dice *tomatoes*', n('Dice', 'tomatoes') ],
 
 		[
 			'a single step with multiple ingredients',
-			'Dice: tomatoes, onions',
+			'- Dice *tomatoes*, *onions*.',
 			n('Dice', 'tomatoes', 'onions')
 		],
 
 		[
 			'ingredients with complex descriptions',
-			'Dice: 1 (12-ounce) can tomatoes (whole, roasted), 4 onions',
+			'- Dice *1 (12-ounce) can tomatoes (whole, roasted)*, *4 onions*',
 			n('Dice', '1 (12-ounce) can tomatoes (whole, roasted)', '4 onions')
 		],
 
 		[
 			'multiple steps',
 			`
-				Dice: tomatoes
-				Dice: onions
+				- Dice *tomatoes*.
+				- Dice *onions*.
 			`,
 			n('Dice', 'tomatoes'),
 			n('Dice', 'onions'),
@@ -54,8 +54,8 @@ describe('parseRecipe', () => {
 			'multiple connected steps',
 			`
 				In a bowl:
-				Beat: eggs
-				Beat in: sugar
+				- Beat *eggs*
+				- Beat in *sugar*
 			`,
 			n(
 				'Beat in',
@@ -68,15 +68,15 @@ describe('parseRecipe', () => {
 			'different sets of steps',
 			`
 				In a bowl:
-				Beat: eggs
-				Beat in: sugar
+				- Beat *eggs*
+				- Beat in *sugar*
 
 				Separately:
-				Chop: onions
+				- Chop *onions*
 
 				For crust:
-				Cut into pieces: butter
-				Mix in slowly: flour
+				- Cut *butter* into pieces
+				- Mix *flour* in slowly
 			`,
 			n(
 				'Beat in',
@@ -98,11 +98,11 @@ describe('parseRecipe', () => {
 			'connected sets of steps',
 			`
 				In bowl:
-				Beat: eggs
+				- Beat *eggs*
 
 				Meanwhile:
-				Grate: cheese
-				Mix: into bowl
+				- Grate *cheese*
+				- Mix *into bowl*
 			`,
 			n(
 				'Mix',
@@ -115,14 +115,14 @@ describe('parseRecipe', () => {
 			'connected sets of steps with partial description',
 			`
 				In large heatproof bowl:
-				Beat: eggs
+				- Beat *eggs*
 
 				In small dish:
-				Scatter: peppercorns
+				- Scatter *peppercorns*
 
 				Separately:
-				Grate: cheese
-				Mix: into bowl
+				- Grate *cheese*
+				- Mix *into bowl*
 			`,
 			n('Scatter', 'peppercorns'),
 			n(
@@ -136,11 +136,12 @@ describe('parseRecipe', () => {
 			'context with spaces after',
 			`
 				In bowl:
-				Beat: eggs
+				- Beat *eggs*
 
 				Meanwhile:
-				Grate: cheese
-				Mix: into bowl `,
+				- Grate *cheese*
+				- Mix *into bowl *
+			`,
 			n(
 				'Mix',
 				n('Beat', 'eggs'),
@@ -152,11 +153,11 @@ describe('parseRecipe', () => {
 			'context creation with spaces after',
 			`
 				In bowl :
-				Beat: eggs
+				- Beat *eggs*
 
 				Meanwhile:
-				Grate: cheese
-				Mix: into bowl
+				- Grate *cheese*
+				- Mix *into bowl*
 			`,
 			n(
 				'Mix',
@@ -169,15 +170,15 @@ describe('parseRecipe', () => {
 			'multiple combinations',
 			`
 				In bowl:
-				Beat: eggs
+				- Beat *eggs*
 
 				Separately:
-				Grind: salt
-				Sprinkle: in bowl
+				- Grind *salt*
+				- Sprinkle *in bowl*
 
 				Separately:
-				Grind: pepper
-				Sprinkle: in bowl
+				- Grind *pepper*
+				- Sprinkle *in bowl*
 			`,
 			n(
 				'Sprinkle',
@@ -194,18 +195,18 @@ describe('parseRecipe', () => {
 			'combinations by ingredient',
 			`
 				In bowl:
-				Beat: chicken eggs
+				- Beat *chicken eggs*
 
 				Separately:
-				Grind: salt
-				Sprinkle: on eggs
+				- Grind *salt*
+				- Sprinkle *on eggs*
 
-				In bowl:
-				Sift: flour (all-purpose)
+				In small bowl:
+				- Sift *flour (all-purpose)*
 
 				Separately:
-				Measure: sugar
-				Stir: into flour
+				- Measure *sugar*
+				- Stir *into flour*
 			`,
 			n(
 				'Sprinkle',
@@ -220,7 +221,7 @@ describe('parseRecipe', () => {
 		],
 	].forEach( ([ testDescription, recipeText, ...expected ]) => {
 		it(`should parse ${testDescription}`, () => {
-			let nodes = parser.parseRecipe(recipeText);
+			let nodes = parser.parseRecipe(recipeText.replace(/^\t+/gm, ''));
 			debug("RecipeNodes: %o", nodes);
 
 			stripInternalProperties(nodes);
