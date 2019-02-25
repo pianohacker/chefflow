@@ -152,7 +152,7 @@ function popMatchingStep(state: visitorState, description: string): RecipeNode {
 	);
 
 	if (matchingIndex == -1) {
-		return {error: 'no previous steps related to: ' + description};
+		return {error: "Can't find: " + description};
 	}
 
 	let [matchingStep] = state.stack.splice(matchingIndex, 1);

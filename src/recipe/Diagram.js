@@ -35,9 +35,14 @@ const RecipeIngredient = styled(RecipeCell)`
 	padding-left: 1.25em;
 `;
 
+const RecipeError = styled(RecipeCell)`
+	color: #800;
+`;
+
 export default class RecipeDiagram extends React.PureComponent {
 	render() {
 		let recipeNodes = parser.parseRecipe(this.props.recipeText);
+		window.recipeNodes = recipeNodes;
 
 		let [laidOutRecipeNodes, width, height] = layoutRecipeNodes(recipeNodes);
 
@@ -77,14 +82,22 @@ class RecipeDiagramTable extends React.Component {
 							let node;
 							if (!(node = grid[x][y]) || node === true) return null;
 
-							const Component = node.ingredient ? RecipeIngredient : RecipeCell;
+							let Component;
+
+							if (node.ingredient) {
+								Component = RecipeCell;
+							} else if (node.error) {
+								Component = RecipeError;
+							} else {
+								Component = RecipeIngredient;
+							}
 
 							return <Component
 									key={x}
 									colSpan={node.width}
 									rowSpan={node.height}
 								>
-								{node.text || node.ingredient}
+								{node.text || node.ingredient || node.error}
 							</Component>;
 						})}
 					</tr>
@@ -128,6 +141,7 @@ function layoutRecipeNodes(recipeNodes, startY = 0) {
 			height: (y - startY) || 1,
 			text: node.text,
 			ingredient: node.ingredient,
+			error: node.error,
 		});
 
 		if (x >= maxWidth) maxWidth = x + 1;
