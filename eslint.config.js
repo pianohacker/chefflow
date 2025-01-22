@@ -23,9 +23,7 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
-      "rules": {
-      	"semi": 0,
-      }
+      "semi": 0,
     },
   },
 )
