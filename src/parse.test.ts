@@ -54,6 +54,51 @@ describe("parseRecipe()", () => {
         },
       })),
     },
+    // Adapted from https://www.makebetterfood.com/recipes/garlic-bread/
+    {
+      desc: "multi-ingredient multi-step recipe with basic units",
+      input: `
+      slice in half: 2 loaves of Italian bread
+      roast without peeling: 1 head of garlic
+      soften: 12 tbsp of butter
+      grate: .5 cup of Parmesan
+      peel and mince: @garlic
+      mix: @butter, @Parmesan, @garlic, 1 tsp of salt, 1 tsp of black pepper
+      spread: @bread, @butter
+      bake: @bread
+      `,
+      result: makeResult((i) => ({
+        ingredients: [
+          i({ type: "Italian bread", unit: "loaves", amount: 2 }),
+          i({ type: "garlic", unit: "head", amount: 1 }),
+          i({ type: "butter", unit: "tbsp", amount: 12 }),
+          i({ type: "Parmesan", unit: "cup", amount: 0.5 }),
+          i({ type: "salt", unit: "tsp", amount: 1 }),
+          i({ type: "black pepper", unit: "tsp", amount: 1 }),
+        ],
+        stepTree: {
+          desc: "bake",
+          inputs: [
+            {
+              desc: "spread",
+              inputs: [
+                { desc: "slice in half", inputs: [i(0)] },
+                {
+                  desc: "mix",
+                  inputs: [
+                    { desc: "soften", inputs: [i(2)] },
+                    { desc: "grate", inputs: [i(3)] },
+                    { desc: "peel and mince", inputs: [{ desc: "roast without peeling", inputs: [i(1)] }] },
+                    i(4),
+                    i(5),
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      })),
+    },
   ])("parses $desc correctly", ({ input, result }) => {
     expect(parseRecipe(input)).toEqual(result);
   });
