@@ -14,7 +14,7 @@ export function RecipeEditor({
 
       for (const type of ["text/html", "text/plain"]) {
         if (clipboardData.types.includes(type)) {
-          const cfDataMatch = /CF(\d+)_([a-zA-Z0-9+/]+)/.exec(clipboardData.getData(type));
+          const cfDataMatch = /CF(\d+)_([a-zA-Z0-9+\x2f]+)/.exec(clipboardData.getData(type));
           const [, version, data] = cfDataMatch || [];
 
           if (cfDataMatch) {
