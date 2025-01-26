@@ -1,4 +1,6 @@
 .recipeEditor {
-  height: 10em;
+  flex: 1 0 10em;
+  font-family: inherit;
+  font-size: inherit;
   width: 100%;
 }

@@ -7,13 +7,13 @@ import { RecipePreview } from "./RecipePreview";
 function App() {
   const [recipeText, setRecipeText] = useState("");
 
-  console.log(appStyles);
-
   return (
     <>
-      <h1 className={appStyles.mainHeader}>Chefflow</h1>
-      <RecipeEditor recipeText={recipeText} setRecipeText={setRecipeText} />
-      <RecipePreview recipeText={recipeText} />
+      <main>
+        <h1 className={appStyles.mainHeader}>Chefflow</h1>
+        <RecipeEditor recipeText={recipeText} setRecipeText={setRecipeText} />
+        <RecipePreview recipeText={recipeText} />
+      </main>
     </>
   );
 }

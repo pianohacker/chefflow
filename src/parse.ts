@@ -15,6 +15,7 @@ export const isIngredient = (x: object): x is Ingredient => !!("type" in x && x.
 
 export type Step = {
   desc: string;
+  resultName?: string;
   inputs: (Step | Ingredient)[];
 };
 export const isStep = (x: object): x is Step => !!("desc" in x && x.desc && "inputs" in x && x.inputs);
@@ -24,16 +25,35 @@ export interface Recipe {
   stepTree: Step;
 }
 
-export function parseRecipe(input: string): Recipe {
+export interface LineError {
+  line: number;
+  error: string;
+}
+
+export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[] } {
+  const errors: LineError[] = [];
+
   const lines = input
     .split("\n")
-    .map((line, i): [string[], number] => [line.trim().split(/\s*:\s*/, 2), i])
-    .filter(([l]) => l.length == 2);
+    .map((line, i): [string, number] => [line.trim(), i])
+    .filter(([line]) => !!line)
+    .map(([line, i]): [string[], number] => [line.trim().split(/\s*:\s*/, 2), i])
+    .filter(([line, i]) => {
+      if (line.length != 2) {
+        errors.push({ line: i + 1, error: "Unrecognized line (missing colon)" });
+
+        return false;
+      }
+
+      return true;
+    });
 
   const ingredients: Ingredient[] = [];
   const inputs: (Step | Ingredient)[] = [];
 
-  for (const [[desc, inputsText], i] of lines) {
+  for (const [[descText, inputsText], i] of lines) {
+    const [desc, resultName] = descText.split(/\s+@/, 2);
+
     const newInputs = inputsText
       .split(/\s*,\s*/)
       .map((inputText) => {
@@ -60,6 +80,8 @@ export function parseRecipe(input: string): Recipe {
 
           const refIndex = inputs.findIndex((input) => {
             if (isStep(input)) {
+              if (input.resultName && refRe.test(input.resultName)) return true;
+
               let firstIngredient = input.inputs[0];
 
               while (firstIngredient) {
@@ -76,18 +98,20 @@ export function parseRecipe(input: string): Recipe {
           });
 
           if (refIndex == -1) {
-            throw new Error(`could not find match for reference @${ref} on line ${i + 1}`);
+            errors.push({ line: i + 1, error: `Can't find result @${ref}` });
+            return null;
           } else {
             return inputs.splice(refIndex, 1)[0];
           }
         }
 
+        errors.push({ line: i + 1, error: `Not an ingredient or result: ${inputText}` });
         return null;
       })
       .filter((m) => !!m);
 
-    inputs.push({ desc, inputs: newInputs });
+    inputs.push({ desc, resultName, inputs: newInputs });
   }
 
-  return { ingredients, stepTree: (inputs[0] as Step) || { desc: "", inputs: [] } };
+  return { recipe: { ingredients, stepTree: (inputs[0] as Step) || { desc: "", inputs: [] } }, errors };
 }

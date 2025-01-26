@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { Ingredient, parseRecipe, Recipe } from "./parse";
+import { Ingredient, LineError, parseRecipe, Recipe } from "./parse";
 
 describe("parseRecipe()", () => {
   // Convenience function for making parsed Recipe objects.
@@ -9,19 +9,25 @@ describe("parseRecipe()", () => {
   //   * references a previously used ingredient
   //
   // and returns a Recipe.
-  const makeResult = (template: (i: (x: number | Ingredient) => Ingredient) => Recipe): Recipe => {
+  const makeResult = (
+    template: (i: (x: number | Ingredient) => Ingredient) => Recipe,
+    errors: LineError[] = [],
+  ): ReturnType<typeof parseRecipe> => {
     const ingredients: Ingredient[] = [];
 
-    return template((x) => (typeof x === "number" ? ingredients[x] : (ingredients.push(x), x)));
+    return { recipe: template((x) => (typeof x === "number" ? ingredients[x] : (ingredients.push(x), x))), errors };
   };
 
-  test.each<{ desc: string; input: string; result: Recipe }>([
+  test.each<{ desc: string; input: string; result: ReturnType<typeof parseRecipe> }>([
     {
       desc: "empty recipe",
       input: "",
       result: {
-        ingredients: [],
-        stepTree: { desc: "", inputs: [] },
+        recipe: {
+          ingredients: [],
+          stepTree: { desc: "", inputs: [] },
+        },
+        errors: [],
       },
     },
     {
@@ -51,6 +57,26 @@ describe("parseRecipe()", () => {
         stepTree: {
           desc: "sautee",
           inputs: [i(0), i(1)],
+        },
+      })),
+    },
+    {
+      desc: "multi-step recipe with custom backreference names",
+      input: `
+      crush @paste: 2 snozzberries
+      simmer: @paste
+      `,
+      result: makeResult((i) => ({
+        ingredients: [i({ type: "snozzberries", amount: 2 })],
+        stepTree: {
+          desc: "simmer",
+          inputs: [
+            {
+              desc: "crush",
+              inputs: [i(0)],
+              resultName: "paste",
+            },
+          ],
         },
       })),
     },
@@ -98,6 +124,33 @@ describe("parseRecipe()", () => {
           ],
         },
       })),
+    },
+    {
+      desc: "multi-step recipe with errors",
+      input: `crush @paste: 2 snozzberries
+      nonsense
+      simmer: @paste, bad ingredients, @nonexistent
+      `,
+      result: makeResult(
+        (i) => ({
+          ingredients: [i({ type: "snozzberries", amount: 2 })],
+          stepTree: {
+            desc: "simmer",
+            inputs: [
+              {
+                desc: "crush",
+                inputs: [i(0)],
+                resultName: "paste",
+              },
+            ],
+          },
+        }),
+        [
+          { line: 2, error: expect.stringMatching(/unrecognized/i) },
+          { line: 3, error: expect.stringMatching(/not.*bad ingredients/i) },
+          { line: 3, error: expect.stringMatching(/find.*@nonexistent/i) },
+        ],
+      ),
     },
   ])("parses $desc correctly", ({ input, result }) => {
     expect(parseRecipe(input)).toEqual(result);
