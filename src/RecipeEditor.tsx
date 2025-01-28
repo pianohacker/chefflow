@@ -1,5 +1,15 @@
 import { useCallback } from "react";
+import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import classes from "./RecipeEditor.module.css";
+
+const cmTheme = EditorView.theme({
+  "&": {
+    fontSize: "1.2rem",
+  },
+  ".cm-content": {
+    fontFamily: "Atkinson Hyperlegible",
+  },
+});
 
 export function RecipeEditor({
   recipeText,
@@ -31,11 +41,16 @@ export function RecipeEditor({
   );
 
   return (
-    <textarea
+    <CodeMirror
       className={classes.recipeEditor}
       value={recipeText}
+      basicSetup={{
+        lineNumbers: false,
+      }}
+      height="100%"
+      theme={cmTheme}
       onPaste={onPaste}
-      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRecipeText(e.target.value)}
+      onChange={(v: string) => setRecipeText(v)}
     />
   );
 }

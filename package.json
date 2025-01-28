@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.1.1",
+    "@uiw/react-codemirror": "^4.23.7",
     "escape-string-regexp": "^5.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
