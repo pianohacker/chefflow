@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { Ingredient, isIngredient, parseRecipe, Step } from "./parse";
 import classes from "./RecipePreview.module.css";
+import makeCssInline from "./make-css-inline";
 
 function range(start: number, stop?: number, step: number = 1) {
   if (stop == null) {
@@ -87,8 +88,6 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
 
     fillGrid(recipeGrid);
 
-    console.log({ recipeGrid });
-
     return { recipeGrid, errors };
   }, [recipeText]);
 
@@ -100,7 +99,9 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
     if (!diagramRef.current) return;
 
     navigator.clipboard.write([
-      new ClipboardItem({ "text/html": new Blob([diagramRef.current.outerHTML], { type: "text/html" }) }),
+      new ClipboardItem({
+        "text/html": new Blob([(makeCssInline(diagramRef.current) as HTMLElement).outerHTML], { type: "text/html" }),
+      }),
     ]);
   }, [diagramRef]);
 

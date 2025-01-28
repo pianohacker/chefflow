@@ -1,4 +1,6 @@
 .recipeEditor {
+  background: #f8f8f8;
+  color: inherit;
   flex: 1 0 10em;
   font-family: inherit;
   font-size: inherit;
