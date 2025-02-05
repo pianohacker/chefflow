@@ -53,7 +53,7 @@ describe("parseRecipe()", () => {
       desc: "multi-ingredient one-step recipe with basic units",
       input: "sautee: 5 onions, 3 cloves of garlic",
       result: makeResult((i) => ({
-        ingredients: [i({ type: "onions", amount: 5 }), i({ type: "garlic", amount: 3, unit: "cloves" })],
+        ingredients: [i({ type: "onions", amount: 5 }), i({ type: "cloves of garlic", amount: 3 })],
         stepTree: {
           desc: "sautee",
           inputs: [i(0), i(1)],
@@ -86,17 +86,17 @@ describe("parseRecipe()", () => {
       input: `
       slice in half: 2 loaves of Italian bread
       roast without peeling: 1 head of garlic
-      soften: 12 tbsp of butter
-      grate: .5 cup of Parmesan
+      soften: 12 tbsp butter
+      grate: .5 cup Parmesan
       peel and mince: @garlic
-      mix: @butter, @Parmesan, @garlic, 1 tsp of salt, 1 tsp of black pepper
+      mix: @butter, @Parmesan, @garlic, 1 tsp salt, 1 tsp black pepper
       spread: @bread, @butter
       bake: @bread
       `,
       result: makeResult((i) => ({
         ingredients: [
-          i({ type: "Italian bread", unit: "loaves", amount: 2 }),
-          i({ type: "garlic", unit: "head", amount: 1 }),
+          i({ type: "loaves of Italian bread", amount: 2 }),
+          i({ type: "head of garlic", amount: 1 }),
           i({ type: "butter", unit: "tbsp", amount: 12 }),
           i({ type: "Parmesan", unit: "cup", amount: 0.5 }),
           i({ type: "salt", unit: "tsp", amount: 1 }),

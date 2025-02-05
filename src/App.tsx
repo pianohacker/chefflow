@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import appStyles from "./App.module.css";
-import { RecipeEditor } from "./RecipeEditor";
+import { RecipeEditor } from "./editor/RecipeEditor";
 import { RecipePreview } from "./RecipePreview";
 
 function App() {

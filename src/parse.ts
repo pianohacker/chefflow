@@ -1,4 +1,5 @@
 import escapeStringRegexp from "escape-string-regexp";
+import { knownUnits, unitMap } from "./units";
 
 export type KnownUnit = {
   kind: "weight" | "volume";
@@ -30,6 +31,9 @@ export interface LineError {
   error: string;
 }
 
+const UNIT_RE = Array.from(knownUnits).join("|");
+const INGREDIENT_RE = new RegExp(`(\\d+|\\.\\d+|\\d+\\.\\d+)(?:\\s+(${UNIT_RE}))?\\s+(.*)`);
+
 export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[] } {
   const errors: LineError[] = [];
 
@@ -57,7 +61,7 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
     const newInputs = inputsText
       .split(/\s*,\s*/)
       .map((inputText) => {
-        const ingredientMatch = /(?:(\d+|\.\d+|\d+\.\d+)(?:\s+(.+)\s+of)?\s+)(.*)/.exec(inputText);
+        const ingredientMatch = INGREDIENT_RE.exec(inputText);
         if (ingredientMatch) {
           const [, amount, unit, type] = ingredientMatch;
           const ingredient = { amount: parseFloat(amount), unit, type: type };

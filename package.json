@@ -8,11 +8,15 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest --typecheck",
+    "grammar": "lezer-generator --typeScript --names --output src/editor/chefflow.grammar.ts src/editor/chefflow.grammar"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.1.1",
+    "@lezer/generator": "^1.7.2",
+    "@lezer/lr": "^1.4.2",
     "@uiw/react-codemirror": "^4.23.7",
+    "convert": "^5.7.0",
     "escape-string-regexp": "^5.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
