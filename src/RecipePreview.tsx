@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { Ingredient, isIngredient, parseRecipe, Step } from "./parse";
+
+import sharedClasses from "./shared.module.css";
 import classes from "./RecipePreview.module.css";
 import makeCssInline from "./make-css-inline";
 
@@ -121,9 +123,21 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
                 const { input, extent, size } = node;
                 let inputNode;
                 if (isIngredient(input)) {
+                  console.log(
+                    input,
+                    <>
+                      <span className={sharedClasses.recipeAmount}>
+                        {input.amount} {input.unit}
+                      </span>{" "}
+                      {input.type}
+                    </>,
+                  );
                   inputNode = (
                     <>
-                      {input.amount} {input.unit} {input.type}
+                      <span className={sharedClasses.recipeAmount}>
+                        {input.amount} {input.unit}
+                      </span>{" "}
+                      {input.type}
                     </>
                   );
                 } else {

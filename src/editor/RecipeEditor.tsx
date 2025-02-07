@@ -1,15 +1,62 @@
 import { useCallback } from "react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import { styleTags, tags as t } from "@lezer/highlight";
+import { HighlightStyle, LanguageSupport, LRLanguage, syntaxHighlighting } from "@codemirror/language";
+import { completeFromList } from "@codemirror/autocomplete";
+
+import sharedClasses from "../shared.module.css";
 import classes from "./RecipeEditor.module.css";
+import { parser as chefflowParser } from "./chefflow.grammar.ts";
+import { canonUnits } from "../units";
+
+const chefflowParserWithMetadata = chefflowParser.configure({
+  props: [
+    styleTags({
+      ResultName: t.variableName,
+      Amount: t.number,
+      Unit: t.keyword,
+    }),
+  ],
+});
+
+const chefflowLanguage = LRLanguage.define({
+  parser: chefflowParserWithMetadata,
+});
+
+const unitCompletion = chefflowLanguage.data.of({
+  autocomplete: completeFromList(
+    canonUnits.map((unit) => ({
+      label: unit,
+      type: "keyword",
+    })),
+  ),
+});
+
+const chefflowLanguageSupport = new LanguageSupport(chefflowLanguage, [unitCompletion]);
 
 const cmTheme = EditorView.theme({
   "&": {
     fontSize: "1.2rem",
   },
   ".cm-content": {
-    fontFamily: "Atkinson Hyperlegible",
+    fontFamily: "Aleo",
   },
 });
+
+const highlightStyle = HighlightStyle.define([
+  {
+    tag: t.variableName,
+    class: sharedClasses.recipeResultName,
+  },
+  {
+    tag: t.number,
+    class: sharedClasses.recipeAmount,
+  },
+  {
+    tag: t.keyword,
+    class: sharedClasses.recipeAmount,
+  },
+]);
 
 export function RecipeEditor({
   recipeText,
@@ -47,6 +94,7 @@ export function RecipeEditor({
       basicSetup={{
         lineNumbers: false,
       }}
+      extensions={[chefflowLanguageSupport, syntaxHighlighting(highlightStyle)]}
       height="100%"
       theme={cmTheme}
       onPaste={onPaste}

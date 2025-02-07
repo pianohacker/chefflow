@@ -12,9 +12,12 @@
     "grammar": "lezer-generator --typeScript --names --output src/editor/chefflow.grammar.ts src/editor/chefflow.grammar"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.18.4",
+    "@codemirror/language": "^6.10.8",
     "@fontsource/atkinson-hyperlegible": "^5.1.1",
     "@lezer/generator": "^1.7.2",
     "@lezer/lr": "^1.4.2",
+    "@types/node": "^22.13.1",
     "@uiw/react-codemirror": "^4.23.7",
     "convert": "^5.7.0",
     "escape-string-regexp": "^5.0.0",

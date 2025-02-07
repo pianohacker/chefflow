@@ -38,6 +38,7 @@ export const unitMap = {
     ounces: oz
     pound: lb
     pounds: lb
+    lbs: lb
     `,
   ),
   ...makeUnitMap(

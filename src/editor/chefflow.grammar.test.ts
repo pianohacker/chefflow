@@ -110,19 +110,23 @@ describe("lezer grammar", () => {
     },
   ])("parses $desc correctly", ({ input, result }) => {
     const tree = parser.parse(input);
-    let indent = 0;
-    tree.iterate({
-      enter(node) {
-        console.debug("  ".repeat(indent), node.name, `[${node.from}-${node.to}]`);
-        indent++;
-        if (!node.node.firstChild) {
-          console.debug("  ".repeat(indent), `"${input.substring(node.from, node.to)}"`);
-        }
-      },
-      leave() {
-        indent--;
-      },
-    });
+
+    if (process.env.TEST_TREE_DEBUG === "true") {
+      let indent = 0;
+      tree.iterate({
+        enter(node) {
+          console.debug("  ".repeat(indent), node.name, `[${node.from}-${node.to}]`);
+          indent++;
+          if (!node.node.firstChild) {
+            console.debug("  ".repeat(indent), `"${input.substring(node.from, node.to)}"`);
+          }
+        },
+        leave() {
+          indent--;
+        },
+      });
+    }
+
     testTree(tree, result);
   });
 });

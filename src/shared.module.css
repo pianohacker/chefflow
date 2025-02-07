@@ -1,0 +1,8 @@
+.recipeAmount {
+  font-weight: 600;
+}
+
+.recipeResultName {
+  text-decoration: underline;
+  text-decoration-color: #888;
+}
