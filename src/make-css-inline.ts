@@ -1,5 +1,5 @@
 const propertyAllowlist: Partial<Record<keyof HTMLElementTagNameMap | "*", string[]>> = {
-  "*": ["background", "border", "font", "padding"],
+  "*": ["background", "border", "font-family", "font-size", "font-weight", "padding"],
   table: ["border-collapse"],
 };
 
@@ -26,8 +26,6 @@ export default function makeCssInline(node: Node): Node {
 
         newElement.style.setProperty(property, value);
       }
-
-      newElement.setAttribute("data-foo", "blah");
 
       return newElement;
 

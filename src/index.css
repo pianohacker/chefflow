@@ -1,12 +1,13 @@
-@import "@fontsource/atkinson-hyperlegible/400.css";
-@import "@fontsource/atkinson-hyperlegible/700.css";
+@import "@fontsource/solway/400.css";
+@import "@fontsource/solway/500.css";
+@import "@fontsource/solway/700.css";
 
 * {
   box-sizing: border-box;
 }
 
 :root {
-  font-family: "Aleo", "Atkinson Hyperlegible", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Solway", "Atkinson Hyperlegible", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
