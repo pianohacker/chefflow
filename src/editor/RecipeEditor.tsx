@@ -86,7 +86,6 @@ const resultNameGutter = gutter({
 
     let resultName: string | null = null;
     const syntaxStack: string[] = [];
-    console.log(chefflowParser.nodeSet.types);
     tree.iterate({
       enter(node) {
         if (resultName) return false;

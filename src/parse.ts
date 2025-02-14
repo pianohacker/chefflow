@@ -23,7 +23,7 @@ export const isStep = (x: object): x is Step => !!("desc" in x && x.desc && "inp
 
 export interface Recipe {
   ingredients: Ingredient[];
-  stepTree: Step;
+  results: (Step | Ingredient)[];
 }
 
 export interface LineError {
@@ -117,5 +117,5 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
     inputs.push({ desc, resultName, inputs: newInputs });
   }
 
-  return { recipe: { ingredients, stepTree: (inputs[0] as Step) || { desc: "", inputs: [] } }, errors };
+  return { recipe: { ingredients, results: inputs }, errors };
 }

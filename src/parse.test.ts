@@ -25,7 +25,7 @@ describe("parseRecipe()", () => {
       result: {
         recipe: {
           ingredients: [],
-          stepTree: { desc: "", inputs: [] },
+          results: [],
         },
         errors: [],
       },
@@ -35,7 +35,7 @@ describe("parseRecipe()", () => {
       input: "sautee: 5 onions",
       result: makeResult((i) => ({
         ingredients: [i({ type: "onions", amount: 5 })],
-        stepTree: { desc: "sautee", inputs: [i(0)] },
+        results: [{ desc: "sautee", inputs: [i(0)] }],
       })),
     },
     {
@@ -43,10 +43,12 @@ describe("parseRecipe()", () => {
       input: "sautee: 5 onions, 3 radishes",
       result: makeResult((i) => ({
         ingredients: [i({ type: "onions", amount: 5 }), i({ type: "radishes", amount: 3 })],
-        stepTree: {
-          desc: "sautee",
-          inputs: [i(0), i(1)],
-        },
+        results: [
+          {
+            desc: "sautee",
+            inputs: [i(0), i(1)],
+          },
+        ],
       })),
     },
     {
@@ -54,10 +56,12 @@ describe("parseRecipe()", () => {
       input: "sautee: 5 onions, 3 cloves of garlic",
       result: makeResult((i) => ({
         ingredients: [i({ type: "onions", amount: 5 }), i({ type: "cloves of garlic", amount: 3 })],
-        stepTree: {
-          desc: "sautee",
-          inputs: [i(0), i(1)],
-        },
+        results: [
+          {
+            desc: "sautee",
+            inputs: [i(0), i(1)],
+          },
+        ],
       })),
     },
     {
@@ -68,16 +72,18 @@ describe("parseRecipe()", () => {
       `,
       result: makeResult((i) => ({
         ingredients: [i({ type: "snozzberries", amount: 2 })],
-        stepTree: {
-          desc: "simmer",
-          inputs: [
-            {
-              desc: "crush",
-              inputs: [i(0)],
-              resultName: "paste",
-            },
-          ],
-        },
+        results: [
+          {
+            desc: "simmer",
+            inputs: [
+              {
+                desc: "crush",
+                inputs: [i(0)],
+                resultName: "paste",
+              },
+            ],
+          },
+        ],
       })),
     },
     // Adapted from https://www.makebetterfood.com/recipes/garlic-bread/
@@ -102,27 +108,29 @@ describe("parseRecipe()", () => {
           i({ type: "salt", unit: "tsp", amount: 1 }),
           i({ type: "black pepper", unit: "tsp", amount: 1 }),
         ],
-        stepTree: {
-          desc: "bake",
-          inputs: [
-            {
-              desc: "spread",
-              inputs: [
-                { desc: "slice in half", inputs: [i(0)] },
-                {
-                  desc: "mix",
-                  inputs: [
-                    { desc: "soften", inputs: [i(2)] },
-                    { desc: "grate", inputs: [i(3)] },
-                    { desc: "peel and mince", inputs: [{ desc: "roast without peeling", inputs: [i(1)] }] },
-                    i(4),
-                    i(5),
-                  ],
-                },
-              ],
-            },
-          ],
-        },
+        results: [
+          {
+            desc: "bake",
+            inputs: [
+              {
+                desc: "spread",
+                inputs: [
+                  { desc: "slice in half", inputs: [i(0)] },
+                  {
+                    desc: "mix",
+                    inputs: [
+                      { desc: "soften", inputs: [i(2)] },
+                      { desc: "grate", inputs: [i(3)] },
+                      { desc: "peel and mince", inputs: [{ desc: "roast without peeling", inputs: [i(1)] }] },
+                      i(4),
+                      i(5),
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       })),
     },
     {
@@ -134,16 +142,18 @@ describe("parseRecipe()", () => {
       result: makeResult(
         (i) => ({
           ingredients: [i({ type: "snozzberries", amount: 2 })],
-          stepTree: {
-            desc: "simmer",
-            inputs: [
-              {
-                desc: "crush",
-                inputs: [i(0)],
-                resultName: "paste",
-              },
-            ],
-          },
+          results: [
+            {
+              desc: "simmer",
+              inputs: [
+                {
+                  desc: "crush",
+                  inputs: [i(0)],
+                  resultName: "paste",
+                },
+              ],
+            },
+          ],
         }),
         [
           { line: 2, error: expect.stringMatching(/unrecognized/i) },

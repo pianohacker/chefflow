@@ -82,12 +82,21 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
   const { recipeGrid, errors } = useMemo(() => {
     const { recipe, errors } = parseRecipe(recipeText);
 
-    const recipeTree = makeNode(recipe.stepTree);
-    const depth = maxDepth(recipeTree);
+    if (!recipe.results.length) return { recipeGrid: [], errors };
 
-    const recipeGrid: Grid = range(depth).map(() => new Array(recipeTree.size));
+    const recipeTrees = recipe.results.map(makeNode);
+    const depth = Math.max(...recipeTrees.map(maxDepth));
 
-    placeInGrid(recipeTree, recipeGrid, 0);
+    const recipeGrid: Grid = range(depth).map(
+      () => new Array(recipeTrees.map(({ size }) => size).reduce((accum, size) => accum + size, 0)),
+    );
+
+    let y = 0;
+
+    for (const recipeTree of recipeTrees) {
+      placeInGrid(recipeTree, recipeGrid, y);
+      y += recipeTree.size;
+    }
 
     fillGrid(recipeGrid);
 
@@ -115,7 +124,7 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
       </button>
       <table ref={diagramRef}>
         <tbody>
-          {range(recipeGrid[0].length).map((y) => (
+          {range(recipeGrid[0] ? recipeGrid[0].length : 0).map((y) => (
             <tr key={y}>
               {range(recipeGrid.length).map((x) => {
                 const node = recipeGrid[x][y];
