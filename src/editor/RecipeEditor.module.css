@@ -6,3 +6,9 @@
   font-size: inherit;
   width: 100%;
 }
+
+.resultNameGutter :global(.cm-gutterElement) {
+  font-family: Solway;
+  min-width: 1em;
+  padding-right: 0.5em;
+}

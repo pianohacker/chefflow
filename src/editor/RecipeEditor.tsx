@@ -1,13 +1,20 @@
 import { useCallback } from "react";
-import CodeMirror, { EditorView } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, gutter, GutterMarker } from "@uiw/react-codemirror";
 import { styleTags, tags as t } from "@lezer/highlight";
-import { HighlightStyle, LanguageSupport, LRLanguage, syntaxHighlighting } from "@codemirror/language";
+import {
+  ensureSyntaxTree,
+  HighlightStyle,
+  LanguageSupport,
+  LRLanguage,
+  syntaxHighlighting,
+} from "@codemirror/language";
 import { completeFromList } from "@codemirror/autocomplete";
 
 import sharedClasses from "../shared.module.css";
 import classes from "./RecipeEditor.module.css";
 import { parser as chefflowParser } from "./chefflow.grammar.ts";
 import { canonUnits } from "../units";
+import { decodeRecipe } from "../encoding";
 
 const chefflowParserWithMetadata = chefflowParser.configure({
   props: [
@@ -58,6 +65,56 @@ const highlightStyle = HighlightStyle.define([
   },
 ]);
 
+class ResultNameMarker extends GutterMarker {
+  constructor(public resultName: string) {
+    super();
+  }
+
+  toDOM(): Node {
+    const result = document.createElement("span");
+    result.classList.add(sharedClasses.recipeResultName);
+    result.innerText = this.resultName;
+
+    return result;
+  }
+}
+
+const resultNameGutter = gutter({
+  lineMarker(view, line) {
+    const tree = ensureSyntaxTree(view.state, line.to);
+    if (!tree) return null;
+
+    let resultName: string | null = null;
+    const syntaxStack: string[] = [];
+    console.log(chefflowParser.nodeSet.types);
+    tree.iterate({
+      enter(node) {
+        if (resultName) return false;
+
+        switch (node.type.name) {
+          case "ResultName":
+            if (syntaxStack.includes("Ingredient")) {
+              resultName = view.state.sliceDoc(node.from, node.to);
+            }
+            break;
+
+          case "IngredientType":
+            resultName = "@" + view.state.sliceDoc(node.from, node.to);
+            break;
+        }
+        syntaxStack.push(node.type.name);
+      },
+      leave() {
+        syntaxStack.pop();
+      },
+      from: line.from,
+      to: line.to,
+    });
+    return resultName ? new ResultNameMarker(resultName) : null;
+  },
+  class: classes.resultNameGutter,
+});
+
 export function RecipeEditor({
   recipeText,
   setRecipeText,
@@ -71,14 +128,11 @@ export function RecipeEditor({
 
       for (const type of ["text/html", "text/plain"]) {
         if (clipboardData.types.includes(type)) {
-          const cfDataMatch = /CF(\d+)_([a-zA-Z0-9+\x2f]+)/.exec(clipboardData.getData(type));
-          const [, version, data] = cfDataMatch || [];
+          const recipeText = decodeRecipe(clipboardData.getData(type));
 
-          if (cfDataMatch) {
+          if (recipeText) {
             event.preventDefault();
-            if (parseInt(version) == 1) {
-              setRecipeText(atob(data));
-            }
+            setRecipeText(recipeText);
             return;
           }
         }
@@ -94,7 +148,7 @@ export function RecipeEditor({
       basicSetup={{
         lineNumbers: false,
       }}
-      extensions={[chefflowLanguageSupport, syntaxHighlighting(highlightStyle)]}
+      extensions={[chefflowLanguageSupport, syntaxHighlighting(highlightStyle), resultNameGutter]}
       height="100%"
       theme={cmTheme}
       onPaste={onPaste}

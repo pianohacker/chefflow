@@ -4,6 +4,7 @@ import { Ingredient, isIngredient, parseRecipe, Step } from "./parse";
 import sharedClasses from "./shared.module.css";
 import classes from "./RecipePreview.module.css";
 import makeCssInline from "./make-css-inline";
+import { encodeRecipe } from "./encoding";
 
 function range(start: number, stop?: number, step: number = 1) {
   if (stop == null) {
@@ -93,7 +94,7 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
     return { recipeGrid, errors };
   }, [recipeText]);
 
-  const recipeSource = useMemo(() => `CF1_${btoa(recipeText)}`, [recipeText]);
+  const recipeSource = useMemo(() => encodeRecipe(recipeText), [recipeText]);
 
   const diagramRef = useRef<HTMLTableElement | null>(null);
 
@@ -123,15 +124,6 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
                 const { input, extent, size } = node;
                 let inputNode;
                 if (isIngredient(input)) {
-                  console.log(
-                    input,
-                    <>
-                      <span className={sharedClasses.recipeAmount}>
-                        {input.amount} {input.unit}
-                      </span>{" "}
-                      {input.type}
-                    </>,
-                  );
                   inputNode = (
                     <>
                       <span className={sharedClasses.recipeAmount}>
