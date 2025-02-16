@@ -10,7 +10,7 @@ export const parser = LRParser.deserialize({
   maxTerm: 19,
   skippedNodes: [0],
   repeatNodeCount: 2,
-  tokenData: "#o~R_X^!Qpq!Q|}!u!O!P!z!Q![#Y![!]#e!b!c#j#y#z!Q$f$g!Q#BY#BZ!Q$IS$I_!Q$I|$JO!Q$JT$JU!Q$KV$KW!Q&FU&FV!Q~!VY_~X^!Qpq!Q#y#z!Q$f$g!Q#BY#BZ!Q$IS$I_!Q$I|$JO!Q$JT$JU!Q$KV$KW!Q&FU&FV!Q~!zOc~~!}P!Q![#Q~#VPb~!Q![#Q~#_Qb~!O!P!z!Q![#Y~#jOa~~#oO`~",
+  tokenData: "#r~R_X^!Qpq!Q|}!u!O!P!z!Q![#Y![!]#h!b!c#m#y#z!Q$f$g!Q#BY#BZ!Q$IS$I_!Q$I|$JO!Q$JT$JU!Q$KV$KW!Q&FU&FV!Q~!VY_~X^!Qpq!Q#y#z!Q$f$g!Q#BY#BZ!Q$IS$I_!Q$I|$JO!Q$JT$JU!Q$KV$KW!Q&FU&FV!Q~!zOc~~!}P!Q![#Q~#VPb~!Q![#Q~#_Rb~!O!P!z!P!Q!z!Q![#Y~#mOa~~#rO`~",
   tokenizers: [multiWordName, 0],
   topRules: {"Recipe":[0,1]},
   tokenPrec: 0,

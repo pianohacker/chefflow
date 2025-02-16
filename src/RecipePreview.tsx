@@ -6,6 +6,8 @@ import classes from "./RecipePreview.module.css";
 import makeCssInline from "./make-css-inline";
 import { encodeRecipe } from "./encoding";
 
+const DENOMINATORS = [2, 3, 4, 6, 8, 16];
+
 function range(start: number, stop?: number, step: number = 1) {
   if (stop == null) {
     stop = start;
@@ -133,11 +135,27 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
 
                 const { input, extent, size } = node;
                 let inputNode;
+
                 if (isIngredient(input)) {
+                  const { amount, unit } = input;
+                  let amountDesc = amount?.toString();
+
+                  // Check for evenly divisible fraction
+                  if (amount && Math.round(amount) != amount) {
+                    for (const den of DENOMINATORS) {
+                      const num = amount * den;
+
+                      if (Math.abs(Math.round(num) - num) < 0.001) {
+                        amountDesc = `${num}/${den}`;
+                        break;
+                      }
+                    }
+                  }
+
                   inputNode = (
                     <>
                       <span className={sharedClasses.recipeAmount}>
-                        {input.amount} {input.unit as string}
+                        {amountDesc} {unit as string}
                       </span>{" "}
                       {input.type}
                     </>

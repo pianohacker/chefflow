@@ -32,7 +32,7 @@ export interface LineError {
 }
 
 const UNIT_RE = Array.from(knownUnits).join("|");
-const INGREDIENT_RE = new RegExp(`(\\d+|\\.\\d+|\\d+\\.\\d+)(?:\\s+(${UNIT_RE}))?\\s+(.*)`);
+const INGREDIENT_RE = new RegExp(`(\\d+/\\d+|\\d+|\\.\\d+|\\d+\\.\\d+)(?:\\s+(${UNIT_RE}))?\\s+(.*)`);
 
 export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[] } {
   const errors: LineError[] = [];
@@ -64,7 +64,16 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
         const ingredientMatch = INGREDIENT_RE.exec(inputText);
         if (ingredientMatch) {
           const [, amount, unit, type] = ingredientMatch;
-          const ingredient = { amount: parseFloat(amount), unit, type: type };
+
+          let parsedAmount = parseFloat(amount);
+
+          if (amount.includes("/")) {
+            const [num, den] = amount.split("/");
+
+            parsedAmount = parseFloat(num) / parseFloat(den);
+          }
+
+          const ingredient = { amount: parsedAmount, unit, type: type };
           ingredients.push(ingredient);
 
           return ingredient;

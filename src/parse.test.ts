@@ -39,6 +39,14 @@ describe("parseRecipe()", () => {
       })),
     },
     {
+      desc: "one-ingredient one-step recipe with fractions",
+      input: "sautee: 1/4 tsp salt",
+      result: makeResult((i) => ({
+        ingredients: [i({ type: "salt", amount: 0.25, unit: "tsp" })],
+        results: [{ desc: "sautee", inputs: [i(0)] }],
+      })),
+    },
+    {
       desc: "multi-ingredient one-step recipe",
       input: "sautee: 5 onions, 3 radishes",
       result: makeResult((i) => ({

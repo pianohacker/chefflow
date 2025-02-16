@@ -7,7 +7,7 @@
 
 @tokens {
 	space { @whitespace+ }
-	amount { @digit+ | "." @digit+ | @digit+ "." @digit+ }
+	amount { @digit+ | @digit+ "/" @digit+ | "." @digit+ | @digit+ "." @digit+ }
 }
 
 @skip { space }
