@@ -7,7 +7,8 @@
 }
 
 :root {
-  font-family: "Solway", "Atkinson Hyperlegible", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-family: "Solway";
+  font-family: var(--font-family), system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 

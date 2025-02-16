@@ -5,6 +5,10 @@
   font-family: inherit;
   font-size: inherit;
   width: 100%;
+
+  @media print {
+    display: none;
+  }
 }
 
 .resultNameGutter :global(.cm-gutterElement) {

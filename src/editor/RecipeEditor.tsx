@@ -46,7 +46,7 @@ const cmTheme = EditorView.theme({
     fontSize: "1.2rem",
   },
   ".cm-content": {
-    fontFamily: "Solway",
+    fontFamily: "var(--font-family)",
   },
 });
 

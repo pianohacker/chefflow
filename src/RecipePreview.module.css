@@ -2,6 +2,26 @@
   align-self: center;
   margin-top: 1em;
 
+  .controls {
+    display: flex;
+    justify-content: center;
+    margin: 0.6em 0;
+
+    button {
+      border-width: 1px;
+      border-style: solid;
+      border-color: #888;
+      font-family: var(--font-family);
+      font-size: inherit;
+      margin-right: 0.6em;
+      padding: 0.3em 0.6em;
+    }
+
+    @media print {
+      display: none;
+    }
+  }
+
   table {
     background: white;
     border-collapse: collapse;
@@ -18,8 +38,13 @@
 
     .recipeSource td {
       border-style: none;
-      font-size: 0.1em;
+      color: #bbb;
+      font-size: 0.6em;
       text-align: center;
+
+      @media print {
+        display: none;
+      }
     }
   }
 }

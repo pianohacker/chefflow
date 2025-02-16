@@ -79,7 +79,7 @@ function fillGrid(grid: Grid): void {
 }
 
 export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Element {
-  const { recipeGrid, errors } = useMemo(() => {
+  const { recipeGrid, errors: _errors } = useMemo(() => {
     const { recipe, errors } = parseRecipe(recipeText);
 
     if (!recipe.results.length) return { recipeGrid: [], errors };
@@ -117,11 +117,12 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
     ]);
   }, [diagramRef]);
 
+  const onClickPrint = useCallback(() => {
+    window.print();
+  }, []);
+
   return (
     <div className={classes.recipePreview}>
-      <button className={classes.copy} onClick={onClickCopy}>
-        Copy Diagram
-      </button>
       <table ref={diagramRef}>
         <tbody>
           {range(recipeGrid[0] ? recipeGrid[0].length : 0).map((y) => (
@@ -136,7 +137,7 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
                   inputNode = (
                     <>
                       <span className={sharedClasses.recipeAmount}>
-                        {input.amount} {input.unit}
+                        {input.amount} {input.unit as string}
                       </span>{" "}
                       {input.type}
                     </>
@@ -154,10 +155,21 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
             </tr>
           ))}
           <tr className={classes.recipeSource}>
-            <td colSpan={recipeGrid.length}>{recipeSource}</td>
+            <td colSpan={recipeGrid.length}>
+              Made with Chefflow:{" "}
+              <a href={`${window.location.origin}/#${recipeSource}`}>{`${window.location.origin}/#${recipeSource}`}</a>
+            </td>
           </tr>
         </tbody>
       </table>
+      <div className={classes.controls}>
+        <button className={classes.copy} onClick={onClickCopy}>
+          Copy Diagram
+        </button>
+        <button className={classes.copy} onClick={onClickPrint}>
+          Print
+        </button>
+      </div>
     </div>
   );
 }
