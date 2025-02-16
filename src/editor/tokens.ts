@@ -16,14 +16,12 @@ export const multiWordName = new ExternalTokenizer((input) => {
   let text = "";
 
   let numEndingSpaces = 0;
-  let lastWordEnd = input.pos;
   while (!ENDS.includes(next)) {
     if (text) text += " ";
     while (!ENDS.includes(next) && !SPACE.includes(next)) {
       text += String.fromCharCode(next);
       input.advance();
       next = input.next;
-      lastWordEnd = input.pos;
     }
 
     numEndingSpaces = 0;

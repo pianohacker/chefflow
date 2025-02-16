@@ -1,5 +1,5 @@
 import escapeStringRegexp from "escape-string-regexp";
-import { knownUnits, unitMap } from "./units";
+import { knownUnits } from "./units";
 
 export type KnownUnit = {
   kind: "weight" | "volume";
