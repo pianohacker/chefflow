@@ -38,6 +38,30 @@ describe("lezer grammar", () => {
       )`,
     },
     {
+      desc: "multi-step recipe with shortcut backreference names",
+      input: `
+      crush: 2 snozzberries
+      simmer: ^, bozzsnerries
+      bifurcate: above, 1 tsp hobwaries
+      `,
+      result: `Recipe(
+        Step(
+          StepDesc,
+          Ingredient(Amount, IngredientType),
+        ),
+        Step(
+          StepDesc,
+          Ingredient(BackReference(LastResult)),
+          Ingredient(IngredientType),
+        ),
+        Step(
+          StepDesc,
+          Ingredient(BackReference(LastResult)),
+          Ingredient(Amount, Unit, IngredientType),
+        ),
+      )`,
+    },
+    {
       desc: "multi-step recipe with custom backreference names",
       input: `
       crush @paste: 2 snozzberries
@@ -51,7 +75,7 @@ describe("lezer grammar", () => {
         ),
         Step(
           StepDesc,
-          Ingredient(ResultName),
+          Ingredient(BackReference(ResultName)),
         ),
       )`,
     },
@@ -87,24 +111,24 @@ describe("lezer grammar", () => {
         ),
         Step(
           StepDesc,
-          Ingredient(ResultName),
+          Ingredient(BackReference(ResultName)), 
         ),
         Step(
           StepDesc,
-          Ingredient(ResultName),
-          Ingredient(ResultName),
-          Ingredient(ResultName),
+          Ingredient(BackReference(ResultName)), 
+          Ingredient(BackReference(ResultName)), 
+          Ingredient(BackReference(ResultName)), 
           Ingredient(Amount, Unit, IngredientType),
           Ingredient(Amount, Unit, IngredientType),
         ),
         Step(
           StepDesc,
-          Ingredient(ResultName),
-          Ingredient(ResultName),
+          Ingredient(BackReference(ResultName)), 
+          Ingredient(BackReference(ResultName)), 
         ),
         Step(
           StepDesc,
-          Ingredient(ResultName),
+          Ingredient(BackReference(ResultName)), 
         ),
       )`,
     },

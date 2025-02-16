@@ -1,13 +1,13 @@
 @top Recipe { Step* }
 
-@external tokens multiWordName from "./tokens" {
-	multiWordName,
-	unit
-}
-
 @tokens {
 	space { @whitespace+ }
 	amount { @digit+ | @digit+ "/" @digit+ | "." @digit+ | @digit+ "." @digit+ }
+}
+
+@external tokens multiWordName from "./tokens" {
+	multiWordName,
+	unit
 }
 
 @skip { space }
@@ -15,7 +15,9 @@
 Step { StepDesc ResultName? ":" Ingredient ("," Ingredient)* }
 StepDesc { multiWordName }
 ResultName { "@" multiWordName }
+LastResult { "^" | "above" }
+BackReference { ResultName | LastResult }
 Amount { amount }
 Unit { unit }
 IngredientType { multiWordName }
-Ingredient { Amount Unit? IngredientType | ResultName }
+Ingredient { Amount? Unit? IngredientType | BackReference }

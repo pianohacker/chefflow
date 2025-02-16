@@ -94,6 +94,39 @@ describe("parseRecipe()", () => {
         ],
       })),
     },
+    {
+      desc: "multi-step recipe with shortcut backreference",
+      input: `
+      crush: 2 snozzberries
+      simmer: ^, bozzsnerries
+      bifurcate: above, 1 tsp hobwaries
+      `,
+      result: makeResult((i) => ({
+        ingredients: [
+          i({ type: "snozzberries", amount: 2 }),
+          i({ type: "bozzsnerries" }),
+          i({ type: "hobwaries", amount: 1, unit: "tsp" }),
+        ],
+        results: [
+          {
+            desc: "bifurcate",
+            inputs: [
+              {
+                desc: "simmer",
+                inputs: [
+                  {
+                    desc: "crush",
+                    inputs: [i(0)],
+                  },
+                  i(1),
+                ],
+              },
+              i(2),
+            ],
+          },
+        ],
+      })),
+    },
     // Adapted from https://www.makebetterfood.com/recipes/garlic-bread/
     {
       desc: "multi-ingredient multi-step recipe with basic units",
@@ -145,7 +178,7 @@ describe("parseRecipe()", () => {
       desc: "multi-step recipe with errors",
       input: `crush @paste: 2 snozzberries
       nonsense
-      simmer: @paste, bad ingredients, @nonexistent
+      simmer: , @paste, @nonexistent
       `,
       result: makeResult(
         (i) => ({
@@ -165,7 +198,7 @@ describe("parseRecipe()", () => {
         }),
         [
           { line: 2, error: expect.stringMatching(/unrecognized/i) },
-          { line: 3, error: expect.stringMatching(/not.*bad ingredients/i) },
+          { line: 3, error: expect.stringMatching(/empty/i) },
           { line: 3, error: expect.stringMatching(/find.*@nonexistent/i) },
         ],
       ),

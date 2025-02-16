@@ -3,16 +3,16 @@ import {LRParser} from "@lezer/lr"
 import {multiWordName} from "./tokens"
 export const parser = LRParser.deserialize({
   version: 14,
-  states: "$bQVQROOOOQO'#C_'#C_O[QQO'#C^OOQP'#Ce'#CeQVQROOOdQRO'#C`OiQQO,58xOqQQO,58xOOQP-E6c-E6cOOQP,58z,58zOOQP'#Cb'#CbOvQRO'#CaOOQP'#Ca'#CaO!OQRO1G.dOiQQO1G.dOOQP'#Cc'#CcOOQP'#Cd'#CdOOQP,58{,58{O!ZQRO,58{OiQQO'#CfO!`QRO7+$OO!`QRO7+$OOOQP1G.g1G.gOOQP,59Q,59QOOQP-E6d-E6dO!kQRO<<Gj",
-  stateData: "!v~O_OS~O[PO~O`TOaUO~O[XO~O`TObYO~Oa^O~O[`O]_O~OccOZQi[Qi~O[`O~OccOZQq[Qq~OccOZQy[Qy~O",
-  goto: "!eZPP[`dluz}!T!ZTROSTQOSQVQV[U^cQ]UQe^RgcVZU^cRbZQaZRfbQSORWSQd]ShdiRie",
-  nodeNames: "⚠ Recipe Step StepDesc ResultName Ingredient Amount Unit IngredientType",
-  maxTerm: 19,
+  states: "$tQVQROOOOQO'#C_'#C_O[QPO'#C^OOQQ'#Cg'#CgQVQROOOdQRO'#C`OiQRO,58xO}QPO,58xOOQQ-E6e-E6eOOQQ,58z,58zOOQQ'#Cb'#CbOOQQ'#Cc'#CcOOQQ'#Cd'#CdOOQQ'#Cf'#CfOOQQ'#Ce'#CeOOQQ'#Ca'#CaO!SQRO'#CaO!XQRO'#CaO!aQRO1G.dOiQRO1G.dOOQQ,58{,58{O!SQRO,58{OiQRO'#ChO!lQRO7+$OO!lQRO7+$OOOQQ1G.g1G.gOOQQ,59S,59SOOQQ-E6f-E6fO!wQRO<<Gj",
+  stateData: "#S~OaOS~O^PO~ObTOcUO~O^XO~O^[O_ZObTOdYOe]Of]O~OccO~O^[O~O^[O_ZO~OgfO]Qi^Qi~OgfO]Qq^Qq~OgfO]Qy^Qy~O",
+  goto: "!w]PP^bfnw|!U!bi!g!mTROSTQOSQVQV^UcfQbUQhcRjfVaUcfU`UcfReaU_UcfSd`aRieV_UcfQSORWSQgbSkglRlh",
+  nodeNames: "⚠ Recipe Step StepDesc ResultName Ingredient Amount Unit IngredientType BackReference LastResult",
+  maxTerm: 23,
   skippedNodes: [0],
   repeatNodeCount: 2,
-  tokenData: "#r~R_X^!Qpq!Q|}!u!O!P!z!Q![#Y![!]#h!b!c#m#y#z!Q$f$g!Q#BY#BZ!Q$IS$I_!Q$I|$JO!Q$JT$JU!Q$KV$KW!Q&FU&FV!Q~!VY_~X^!Qpq!Q#y#z!Q$f$g!Q#BY#BZ!Q$IS$I_!Q$I|$JO!Q$JT$JU!Q$KV$KW!Q&FU&FV!Q~!zOc~~!}P!Q![#Q~#VPb~!Q![#Q~#_Rb~!O!P!z!P!Q!z!Q![#Y~#mOa~~#rO`~",
-  tokenizers: [multiWordName, 0],
+  tokenData: "$l~RaX^!Wpq!W|}!{!O!P#Q!Q![#`![!]#n!b!c#s#Q#R#x#T#U#}#y#z!W$f$g!W#BY#BZ!W$IS$I_!W$I|$JO!W$JT$JU!W$KV$KW!W&FU&FV!W~!]Ya~X^!Wpq!W#y#z!W$f$g!W#BY#BZ!W$IS$I_!W$I|$JO!W$JT$JU!W$KV$KW!W&FU&FV!W~#QOg~~#TP!Q![#W~#]Pd~!Q![#W~#eRd~!O!P#Q!P!Q#Q!Q![#`~#sOc~~#xOb~~#}Oe~~$QP#U#V$T~$WP#c#d$Z~$^P#j#k$a~$dP#X#Y$g~$lOf~",
+  tokenizers: [0, multiWordName],
   topRules: {"Recipe":[0,1]},
   tokenPrec: 0,
-  termNames: {"0":"⚠","1":"@top","2":"Step","3":"StepDesc","4":"ResultName","5":"Ingredient","6":"Amount","7":"Unit","8":"IngredientType","9":"Step+","10":"(\",\" Ingredient)+","11":"␄","12":"multiWordName","13":"unit","14":"%mainskip","15":"space","16":"\"@\"","17":"\":\"","18":"amount","19":"\",\""}
+  termNames: {"0":"⚠","1":"@top","2":"Step","3":"StepDesc","4":"ResultName","5":"Ingredient","6":"Amount","7":"Unit","8":"IngredientType","9":"BackReference","10":"LastResult","11":"Step+","12":"(\",\" Ingredient)+","13":"␄","14":"multiWordName","15":"unit","16":"%mainskip","17":"space","18":"\"@\"","19":"\":\"","20":"amount","21":"\"^\"","22":"\"above\"","23":"\",\""}
 })

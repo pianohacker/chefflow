@@ -32,6 +32,7 @@ function makeNode(input: Ingredient | Step): Node {
   if (isIngredient(input)) {
     return { size: 1, input: input, children: [], extent: 1 };
   } else {
+    if (!input.inputs) console.trace("makeNode", input);
     const children = input.inputs.map((input) => makeNode(input));
     const size = children.reduce((accum, input) => accum + input.size, 0);
     return { size: size, input, children, extent: 1 };

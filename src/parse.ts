@@ -32,7 +32,7 @@ export interface LineError {
 }
 
 const UNIT_RE = Array.from(knownUnits).join("|");
-const INGREDIENT_RE = new RegExp(`(\\d+/\\d+|\\d+|\\.\\d+|\\d+\\.\\d+)(?:\\s+(${UNIT_RE}))?\\s+(.*)`);
+const INGREDIENT_RE = new RegExp(`(?:(\\d+/\\d+|\\d+|\\.\\d+|\\d+\\.\\d+)\\s+)?(?:(${UNIT_RE})\\s+)?(.*)`);
 
 export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[] } {
   const errors: LineError[] = [];
@@ -61,22 +61,18 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
     const newInputs = inputsText
       .split(/\s*,\s*/)
       .map((inputText) => {
-        const ingredientMatch = INGREDIENT_RE.exec(inputText);
-        if (ingredientMatch) {
-          const [, amount, unit, type] = ingredientMatch;
+        if (inputText == "") {
+          errors.push({ line: i + 1, error: "Empty ingredient" });
+          return null;
+        }
 
-          let parsedAmount = parseFloat(amount);
-
-          if (amount.includes("/")) {
-            const [num, den] = amount.split("/");
-
-            parsedAmount = parseFloat(num) / parseFloat(den);
+        if (inputText == "^" || inputText == "above") {
+          if (inputs[0]) {
+            return inputs.pop();
+          } else {
+            errors.push({ line: i + 1, error: "Reference to last result with no previous results" });
+            return null;
           }
-
-          const ingredient = { amount: parsedAmount, unit, type: type };
-          ingredients.push(ingredient);
-
-          return ingredient;
         }
 
         const refMatch = /^@(.*)/.exec(inputText);
@@ -116,6 +112,28 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
           } else {
             return inputs.splice(refIndex, 1)[0];
           }
+        }
+
+        const ingredientMatch = INGREDIENT_RE.exec(inputText);
+        if (ingredientMatch) {
+          const [, amount, unit, type] = ingredientMatch;
+
+          let parsedAmount;
+
+          if (amount) {
+            parsedAmount = parseFloat(amount);
+
+            if (amount.includes("/")) {
+              const [num, den] = amount.split("/");
+
+              parsedAmount = parseFloat(num) / parseFloat(den);
+            }
+          }
+
+          const ingredient = { amount: parsedAmount, unit, type: type };
+          ingredients.push(ingredient);
+
+          return ingredient;
         }
 
         errors.push({ line: i + 1, error: `Not an ingredient or result: ${inputText}` });
