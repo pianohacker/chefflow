@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useRef } from "react";
-import { Ingredient, isIngredient, parseRecipe, Step } from "./parse";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
+import { Ingredient, isIngredient, parseRecipe, Recipe, Step } from "./parse";
 
 import sharedClasses from "./shared.module.css";
 import classes from "./RecipePreview.module.css";
@@ -81,12 +82,20 @@ function fillGrid(grid: Grid): void {
 }
 
 export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Element {
-  const { recipeGrid, errors: _errors } = useMemo(() => {
-    const { recipe, errors } = parseRecipe(recipeText);
+  const debouncedRecipeText = useDebounce(recipeText, 250);
 
-    if (!recipe.results.length) return { recipeGrid: [], errors };
+  const [parsedRecipe, setParsedRecipe] = useState<Recipe | null>(null);
 
-    const recipeTrees = recipe.results.map(makeNode);
+  useEffect(() => {
+    const { recipe, errors } = parseRecipe(debouncedRecipeText);
+
+    if (!errors.length) setParsedRecipe(recipe);
+  }, [debouncedRecipeText]);
+
+  const recipeGrid = useMemo(() => {
+    if (!parsedRecipe || !parsedRecipe.results.length) return [];
+
+    const recipeTrees = parsedRecipe.results.map(makeNode);
     const depth = Math.max(...recipeTrees.map(maxDepth));
 
     const recipeGrid: Grid = range(depth).map(
@@ -102,8 +111,8 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
 
     fillGrid(recipeGrid);
 
-    return { recipeGrid, errors };
-  }, [recipeText]);
+    return recipeGrid;
+  }, [parsedRecipe]);
 
   const recipeSource = useMemo(() => encodeRecipe(recipeText), [recipeText]);
 

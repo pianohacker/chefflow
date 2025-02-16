@@ -15,6 +15,8 @@ import classes from "./RecipeEditor.module.css";
 import { parser as chefflowParser } from "./chefflow.grammar.ts";
 import { canonUnits } from "../units";
 import { decodeRecipe } from "../encoding";
+import { parseRecipe } from "../parse";
+import { Diagnostic, linter } from "@codemirror/lint";
 
 const chefflowParserWithMetadata = chefflowParser.configure({
   props: [
@@ -114,6 +116,17 @@ const resultNameGutter = gutter({
   class: classes.resultNameGutter,
 });
 
+function chefflowLinter(view: EditorView): readonly Diagnostic[] {
+  const { doc } = view.state;
+  const { errors } = parseRecipe(doc.toString());
+
+  return errors.map(({ line, error }) => {
+    const { from, to } = doc.line(line);
+
+    return { severity: "error", from, to, message: error };
+  });
+}
+
 export function RecipeEditor({
   recipeText,
   setRecipeText,
@@ -147,7 +160,12 @@ export function RecipeEditor({
       basicSetup={{
         lineNumbers: false,
       }}
-      extensions={[chefflowLanguageSupport, syntaxHighlighting(highlightStyle), resultNameGutter]}
+      extensions={[
+        chefflowLanguageSupport,
+        syntaxHighlighting(highlightStyle),
+        resultNameGutter,
+        linter(chefflowLinter, { delay: 100 }),
+      ]}
       height="100%"
       theme={cmTheme}
       onPaste={onPaste}

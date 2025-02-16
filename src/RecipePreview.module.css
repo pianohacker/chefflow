@@ -42,6 +42,10 @@
       font-size: 0.6em;
       text-align: center;
 
+      a {
+        word-break: break-all;
+      }
+
       @media print {
         display: none;
       }
