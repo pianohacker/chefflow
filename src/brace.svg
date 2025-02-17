@@ -1,0 +1,21 @@
+<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 1 1"
+		preserveAspectRatio="none"
+	>
+	<path
+		d="
+			M 0 -.1
+			L 1.1 -.1
+			L 1.1 1.1
+			L 0 1.1
+			L 0 1
+			C .75 1 .25 .5 1 .5
+			C .25 .5 .75 0 0 0
+			Z
+		"
+		fill="white"
+		stroke="#888"
+		vector-effect="non-scaling-stroke"
+	/>
+</svg>

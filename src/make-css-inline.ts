@@ -1,5 +1,5 @@
 const propertyAllowlist: Partial<Record<keyof HTMLElementTagNameMap | "*", string[]>> = {
-  "*": ["background", "border", "font-family", "font-size", "font-weight", "padding"],
+  "*": ["background", "border", "font-family", "font-size", "font-weight", "padding", "vertical-align"],
   table: ["border-collapse"],
 };
 

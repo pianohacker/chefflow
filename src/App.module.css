@@ -1,7 +1,5 @@
 main {
   color-scheme: light dark;
-  color: #242424;
-  background-color: #eee;
 
   display: flex;
   flex-direction: column;
@@ -10,6 +8,8 @@ main {
   padding: 1rem 2rem;
 
   @media screen {
+    color: #242424;
+    background-color: #eee;
     min-height: 100vh;
   }
 }

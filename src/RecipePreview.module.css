@@ -51,4 +51,33 @@
       }
     }
   }
+
+  &:not(.export) {
+    table {
+      border-width: 1px;
+      border-left-style: solid;
+      border-right-style: solid;
+      border-color: #888;
+
+      td {
+        position: relative;
+        padding-right: 1.2em;
+        border-left-style: none;
+        border-right-style: none;
+
+        &:not(:first-child)::before {
+          background: url(./brace.svg);
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
+          content: " ";
+          display: block;
+          left: -1.2em;
+          position: absolute;
+          width: 1.2em;
+          height: calc(100% - 1px);
+          top: 1px;
+        }
+      }
+    }
+  }
 }

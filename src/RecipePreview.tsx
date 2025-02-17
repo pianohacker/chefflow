@@ -122,11 +122,13 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
   const onClickCopy = useCallback(() => {
     if (!diagramRef.current) return;
 
+    diagramRef.current.classList.add(classes.export);
     navigator.clipboard.write([
       new ClipboardItem({
         "text/html": new Blob([(makeCssInline(diagramRef.current) as HTMLElement).outerHTML], { type: "text/html" }),
       }),
     ]);
+    diagramRef.current.classList.remove(classes.export);
   }, [diagramRef]);
 
   const onClickPrint = useCallback(() => {
