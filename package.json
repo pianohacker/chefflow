@@ -25,6 +25,8 @@
     "brotli-wasm": "^3.0.1",
     "convert": "^5.7.0",
     "escape-string-regexp": "^5.0.0",
+    "memoize": "^10.0.0",
+    "quick-lru": "^7.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

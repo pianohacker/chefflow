@@ -18,17 +18,34 @@ export type Step = {
   desc: string;
   resultName?: string;
   inputs: (Step | Ingredient)[];
+  lineNum: number;
 };
 export const isStep = (x: object): x is Step => !!("desc" in x && x.desc && "inputs" in x && x.inputs);
 
 export interface Recipe {
   ingredients: Ingredient[];
-  results: (Step | Ingredient)[];
+  results: Step[];
 }
 
 export interface LineError {
-  line: number;
+  lineNum: number;
   error: string;
+}
+
+/**
+ * Breadth-first walk through recipe inputs.
+ */
+export function walkInputs<T>(results: Step[], fn: (input: Step | Ingredient) => T | undefined): T | undefined {
+  const walkQueue: (Step | Ingredient)[] = Array.from(results);
+
+  while (walkQueue.length) {
+    const input = walkQueue.shift()!;
+    const result = fn(input);
+
+    if (result !== undefined) return result;
+
+    if (isStep(input)) walkQueue.push(...input.inputs);
+  }
 }
 
 const UNIT_RE = Array.from(knownUnits).join("|");
@@ -39,12 +56,12 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
 
   const lines = input
     .split("\n")
-    .map((line, i): [string, number] => [line.trim(), i])
+    .map((line, i): [string, number] => [line.trim(), i + 1])
     .filter(([line]) => !!line)
-    .map(([line, i]): [string[], number] => [line.trim().split(/\s*:\s*/, 2), i])
-    .filter(([line, i]) => {
+    .map(([line, lineNum]): [string[], number] => [line.trim().split(/\s*:\s*/, 2), lineNum])
+    .filter(([line, lineNum]) => {
       if (line.length != 2) {
-        errors.push({ line: i + 1, error: "Unrecognized line (missing colon)" });
+        errors.push({ lineNum, error: "Unrecognized line (missing colon)" });
 
         return false;
       }
@@ -53,24 +70,24 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
     });
 
   const ingredients: Ingredient[] = [];
-  const inputs: (Step | Ingredient)[] = [];
+  const results: Step[] = [];
 
-  for (const [[descText, inputsText], i] of lines) {
+  for (const [[descText, inputsText], lineNum] of lines) {
     const [desc, resultName] = descText.split(/\s+@/, 2);
 
     const newInputs = inputsText
       .split(/\s*,\s*/)
       .map((inputText) => {
         if (inputText == "") {
-          errors.push({ line: i + 1, error: "Empty ingredient" });
+          errors.push({ lineNum, error: "Empty ingredient" });
           return null;
         }
 
         if (inputText == "^" || inputText == "above") {
-          if (inputs[0]) {
-            return inputs.pop();
+          if (results[0]) {
+            return results.pop();
           } else {
-            errors.push({ line: i + 1, error: "Reference to last result with no previous results" });
+            errors.push({ lineNum, error: "Reference to last result with no previous results" });
             return null;
           }
         }
@@ -87,30 +104,30 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
               .join(".*"),
           );
 
-          const refIndex = inputs.findIndex((input) => {
-            if (isStep(input)) {
-              if (input.resultName && refRe.test(input.resultName)) return true;
+          const refIndex = results.findLastIndex((result) => {
+            if (isStep(result)) {
+              if (result.resultName && refRe.test(result.resultName)) return true;
 
-              let firstIngredient = input.inputs[0];
-
-              while (firstIngredient) {
-                if (isIngredient(firstIngredient)) {
-                  return refRe.test(firstIngredient.type);
-                }
-
-                firstIngredient = firstIngredient.inputs[0];
-              }
+              if (
+                walkInputs([result], (input) => {
+                  if (isIngredient(input) && refRe.test(input.type)) {
+                    return true;
+                  }
+                })
+              )
+                return true;
             }
-            if (isIngredient(input) && refRe.test(input.type)) return true;
+
+            if (isIngredient(result) && refRe.test(result.type)) return true;
 
             return false;
           });
 
           if (refIndex == -1) {
-            errors.push({ line: i + 1, error: `Can't find result @${ref}` });
+            errors.push({ lineNum, error: `Can't find result @${ref}` });
             return null;
           } else {
-            return inputs.splice(refIndex, 1)[0];
+            return results.splice(refIndex, 1)[0];
           }
         }
 
@@ -136,13 +153,13 @@ export function parseRecipe(input: string): { recipe: Recipe; errors: LineError[
           return ingredient;
         }
 
-        errors.push({ line: i + 1, error: `Not an ingredient or result: ${inputText}` });
+        errors.push({ lineNum, error: `Not an ingredient or result: ${inputText}` });
         return null;
       })
       .filter((m) => !!m);
 
-    inputs.push({ desc, resultName, inputs: newInputs });
+    results.push({ desc, resultName, inputs: newInputs, lineNum });
   }
 
-  return { recipe: { ingredients, results: inputs }, errors };
+  return { recipe: { ingredients, results }, errors };
 }

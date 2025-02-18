@@ -35,7 +35,7 @@ describe("parseRecipe()", () => {
       input: "sautee: 5 onions",
       result: makeResult((i) => ({
         ingredients: [i({ type: "onions", amount: 5 })],
-        results: [{ desc: "sautee", inputs: [i(0)] }],
+        results: [{ desc: "sautee", inputs: [i(0)], lineNum: 1 }],
       })),
     },
     {
@@ -43,7 +43,7 @@ describe("parseRecipe()", () => {
       input: "sautee: 1/4 tsp salt",
       result: makeResult((i) => ({
         ingredients: [i({ type: "salt", amount: 0.25, unit: "tsp" })],
-        results: [{ desc: "sautee", inputs: [i(0)] }],
+        results: [{ desc: "sautee", inputs: [i(0)], lineNum: 1 }],
       })),
     },
     {
@@ -55,6 +55,7 @@ describe("parseRecipe()", () => {
           {
             desc: "sautee",
             inputs: [i(0), i(1)],
+            lineNum: 1,
           },
         ],
       })),
@@ -68,6 +69,50 @@ describe("parseRecipe()", () => {
           {
             desc: "sautee",
             inputs: [i(0), i(1)],
+            lineNum: 1,
+          },
+        ],
+      })),
+    },
+    {
+      desc: "multi-step recipe with non-first and ambiguous backreference names",
+      input: `
+      frobnicate @frob: 2 potatoes
+      incinerate: sea salt, 4 potatoes
+      blend: long pepper, @potatoes
+      splash: @potatoes, @frob
+      `,
+      result: makeResult((i) => ({
+        ingredients: [
+          i({ type: "potatoes", amount: 2 }),
+          i({ type: "sea salt" }),
+          i({ type: "potatoes", amount: 4 }),
+          i({ type: "long pepper" }),
+        ],
+        results: [
+          {
+            desc: "splash",
+            inputs: [
+              {
+                desc: "blend",
+                inputs: [
+                  i(3),
+                  {
+                    desc: "incinerate",
+                    inputs: [i(1), i(2)],
+                    lineNum: 3,
+                  },
+                ],
+                lineNum: 4,
+              },
+              {
+                desc: "frobnicate",
+                inputs: [i(0)],
+                resultName: "frob",
+                lineNum: 2,
+              },
+            ],
+            lineNum: 5,
           },
         ],
       })),
@@ -88,8 +133,10 @@ describe("parseRecipe()", () => {
                 desc: "crush",
                 inputs: [i(0)],
                 resultName: "paste",
+                lineNum: 2,
               },
             ],
+            lineNum: 3,
           },
         ],
       })),
@@ -117,12 +164,15 @@ describe("parseRecipe()", () => {
                   {
                     desc: "crush",
                     inputs: [i(0)],
+                    lineNum: 2,
                   },
                   i(1),
                 ],
+                lineNum: 3,
               },
               i(2),
             ],
+            lineNum: 4,
           },
         ],
       })),
@@ -156,27 +206,35 @@ describe("parseRecipe()", () => {
               {
                 desc: "spread",
                 inputs: [
-                  { desc: "slice in half", inputs: [i(0)] },
+                  { desc: "slice in half", inputs: [i(0)], lineNum: 2 },
                   {
                     desc: "mix",
                     inputs: [
-                      { desc: "soften", inputs: [i(2)] },
-                      { desc: "grate", inputs: [i(3)] },
-                      { desc: "peel and mince", inputs: [{ desc: "roast without peeling", inputs: [i(1)] }] },
+                      { desc: "soften", inputs: [i(2)], lineNum: 4 },
+                      { desc: "grate", inputs: [i(3)], lineNum: 5 },
+                      {
+                        desc: "peel and mince",
+                        inputs: [{ desc: "roast without peeling", inputs: [i(1)], lineNum: 3 }],
+                        lineNum: 6,
+                      },
                       i(4),
                       i(5),
                     ],
+                    lineNum: 7,
                   },
                 ],
+                lineNum: 8,
               },
             ],
+            lineNum: 9,
           },
         ],
       })),
     },
     {
       desc: "multi-step recipe with errors",
-      input: `crush @paste: 2 snozzberries
+      input: `
+      crush @paste: 2 snozzberries
       nonsense
       simmer: , @paste, @nonexistent
       `,
@@ -191,15 +249,17 @@ describe("parseRecipe()", () => {
                   desc: "crush",
                   inputs: [i(0)],
                   resultName: "paste",
+                  lineNum: 2,
                 },
               ],
+              lineNum: 4,
             },
           ],
         }),
         [
-          { line: 2, error: expect.stringMatching(/unrecognized/i) },
-          { line: 3, error: expect.stringMatching(/empty/i) },
-          { line: 3, error: expect.stringMatching(/find.*@nonexistent/i) },
+          { lineNum: 3, error: expect.stringMatching(/unrecognized/i) },
+          { lineNum: 4, error: expect.stringMatching(/empty/i) },
+          { lineNum: 4, error: expect.stringMatching(/find.*@nonexistent/i) },
         ],
       ),
     },

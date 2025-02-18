@@ -1,5 +1,4 @@
 .recipeEditor {
-  background: #f8f8f8;
   color: inherit;
   flex: 1 0 10em;
   font-family: inherit;
@@ -13,6 +12,7 @@
 
 .resultNameGutter :global(.cm-gutterElement) {
   font-family: Solway;
-  min-width: 1em;
+  min-width: 8em;
   padding-right: 0.5em;
+  text-align: right;
 }
