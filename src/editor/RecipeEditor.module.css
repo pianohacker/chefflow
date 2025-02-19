@@ -15,4 +15,12 @@
   min-width: 8em;
   padding-right: 0.5em;
   text-align: right;
+
+  span {
+    cursor: pointer;
+
+    &.noValidResultName {
+      color: #d88;
+    }
+  }
 }

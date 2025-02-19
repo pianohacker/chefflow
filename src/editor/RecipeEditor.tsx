@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import CodeMirror, { EditorView, gutter, GutterMarker, StateField } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, gutter, GutterMarker, lineNumbers, StateField } from "@uiw/react-codemirror";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { HighlightStyle, LanguageSupport, LRLanguage, syntaxHighlighting } from "@codemirror/language";
 import { completeFromList } from "@codemirror/autocomplete";
@@ -47,11 +47,13 @@ const cmTheme = EditorView.theme({
     background: "#f8f8f8",
   },
   ".cm-content": {
-    fontFamily: "var(--font-family)",
+    background: "white",
   },
-  ".cm-line": {
-    borderBottom: "1px solid #aaa",
-    padding: "2px 0",
+  ".cm-lineNumbers": {
+    background: "white",
+  },
+  ".cm-scroller": {
+    fontFamily: "var(--font-family)",
   },
 });
 
@@ -84,9 +86,27 @@ class ResultNameMarker extends GutterMarker {
   }
 }
 
+class NoValidResultNameMarker extends GutterMarker {
+  toDOM(): Node {
+    const result = document.createElement("span");
+    result.classList.add(sharedClasses.recipeResultName);
+    result.classList.add(classes.noValidResultName);
+    result.innerText = "@<no options>";
+
+    return result;
+  }
+}
+
 const memoizedParseRecipe = memoize(parseRecipe, { cache: new QuickLRU({ maxSize: 1000 }) });
 
-const recipeUpToSelectionState = StateField.define<{ recipe: Recipe; lineNames: Record<number, string> }>({
+const noValidResultName: unique symbol = Symbol("noValidResultName");
+
+type LineNames = Record<number, string | typeof noValidResultName>;
+
+const recipeUpToSelectionState = StateField.define<{
+  recipe: Recipe;
+  lineNames: LineNames;
+}>({
   create() {
     return { recipe: { results: [], ingredients: [] }, lineNames: {} };
   },
@@ -96,7 +116,7 @@ const recipeUpToSelectionState = StateField.define<{ recipe: Recipe; lineNames: 
     const { recipe } = memoizedParseRecipe(state.sliceDoc(0, selectionLine.from));
     if (recipe === oldRecipe) return { recipe: oldRecipe, lineNames: oldLineNames };
 
-    const lineNames: Record<number, string> = {};
+    const lineNames: LineNames = {};
     const usedNames = new Set();
     for (const result of Array.from(recipe.results).reverse()) {
       if (result.resultName) {
@@ -115,7 +135,11 @@ const recipeUpToSelectionState = StateField.define<{ recipe: Recipe; lineNames: 
           }
         }
 
-        if (resultNames.length) lineNames[result.lineNum] = resultNames[resultNames.length - 1];
+        if (resultNames.length) {
+          lineNames[result.lineNum] = resultNames[resultNames.length - 1];
+        } else {
+          lineNames[result.lineNum] = noValidResultName;
+        }
       });
     }
 
@@ -137,7 +161,36 @@ const resultNameGutter = [
 
       const resultName = lineNames[lineNum];
 
-      return resultName ? new ResultNameMarker("@" + resultName) : null;
+      if (resultName) {
+        if (resultName == noValidResultName) {
+          return new NoValidResultNameMarker();
+        } else {
+          return new ResultNameMarker("@" + resultName);
+        }
+      }
+
+      return null;
+    },
+    domEventHandlers: {
+      mousedown(view, line) {
+        const { lineNames } = view.state.field(recipeUpToSelectionState);
+        const { number: lineNum } = view.state.doc.lineAt(line.from);
+
+        const resultName = lineNames[lineNum];
+        if (!resultName || resultName == noValidResultName) return false;
+
+        const selectionLine = view.state.doc.lineAt(view.state.selection.ranges[0].from);
+        const selectionLineContents = selectionLine.text;
+
+        let insert = "@" + resultName;
+
+        if (!selectionLineContents.match(/: \s+$/)) {
+          insert = ", " + insert;
+        }
+
+        view.dispatch({ changes: [{ from: selectionLine.to, to: selectionLine.to, insert }] });
+        return true;
+      },
     },
     class: classes.resultNameGutter,
   }),
@@ -191,6 +244,11 @@ export function RecipeEditor({
         chefflowLanguageSupport,
         syntaxHighlighting(highlightStyle),
         resultNameGutter,
+        lineNumbers({
+          formatNumber(lineNumber) {
+            return `${lineNumber}.`;
+          },
+        }),
         linter(chefflowLinter, { delay: 100 }),
         EditorView.lineWrapping,
       ]}
