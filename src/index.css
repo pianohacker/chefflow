@@ -12,6 +12,13 @@
   line-height: 1.5;
   font-weight: 400;
 
+  --cf-red: oklch(86.72% 0.0455 18.06);
+  --cf-blue: oklch(86.72% 0.02 208.63);
+
+  @media screen {
+    background: url(./assets/paper001-ambientcg.jpg);
+  }
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

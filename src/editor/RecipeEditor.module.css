@@ -1,4 +1,7 @@
 .recipeEditor {
+  border-bottom: 2px solid var(--cf-blue);
+  padding-bottom: 1em;
+
   color: inherit;
   flex: 1 0 10em;
   font-family: inherit;
@@ -7,6 +10,12 @@
 
   @media print {
     display: none;
+  }
+
+  :global(.cm-editor) {
+    &:global(.cm-focused) {
+      outline-style: none;
+    }
   }
 }
 

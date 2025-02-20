@@ -43,17 +43,30 @@ const cmTheme = EditorView.theme({
   "&": {
     fontSize: "1.2rem",
   },
-  ".cm-editor": {
-    background: "#f8f8f8",
+  ".cm-scroller": {
+    fontFamily: "var(--font-family)",
+  },
+  ".cm-editor.cm-focused": {
+    outlineStyle: "none",
   },
   ".cm-content": {
     background: "white",
   },
+  ".cm-gutters": {
+    background: "transparent",
+  },
   ".cm-lineNumbers": {
     background: "white",
   },
-  ".cm-scroller": {
-    fontFamily: "var(--font-family)",
+  ".cm-activeLineGutter": {
+    background: "transparent",
+  },
+  ".cm-activeLine, .cm-lineNumbers .cm-activeLineGutter": {
+    background: "transparent",
+    outline: "1px solid var(--cf-blue)",
+  },
+  ".cm-lineNumbers .cm-activeLineGutter": {
+    color: "#242424",
   },
 });
 

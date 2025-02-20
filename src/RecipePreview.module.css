@@ -27,6 +27,10 @@
     border-collapse: collapse;
     border: none;
 
+    @media screen {
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
     td {
       border-width: 1px;
       border-style: solid;
@@ -37,7 +41,6 @@
     }
 
     .recipeSource td {
-      border-style: none;
       color: #bbb;
       font-size: 0.6em;
       text-align: center;
@@ -66,16 +69,16 @@
         border-right-style: none;
 
         &:not(:first-child)::before {
-          background: url(./brace.svg);
+          background: url(./assets/brace.svg);
           background-repeat: no-repeat;
           background-size: 100% 100%;
           content: " ";
           display: block;
-          left: -1.2em;
           position: absolute;
           width: 1.2em;
-          height: calc(100% - 1px);
-          top: 1px;
+          height: 100%;
+          left: -1.2em;
+          top: 0;
         }
       }
     }

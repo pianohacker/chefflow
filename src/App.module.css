@@ -9,12 +9,12 @@ main {
 
   @media screen {
     color: #242424;
-    background-color: #eee;
     min-height: 100vh;
   }
 }
 
 .mainHeader {
+  border-bottom: 2px solid var(--cf-red);
   font-size: 1.5em;
   text-align: left;
 
