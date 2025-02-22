@@ -167,8 +167,11 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
                   inputNode = (
                     <>
                       <span className={sharedClasses.recipeAmount}>
-                        {amountDesc} {unit as string}
-                      </span>{" "}
+                        {amountDesc}
+                        {amountDesc && <>&nbsp;</>}
+                        {unit as string}
+                        {unit && <>&nbsp;</>}
+                      </span>
                       {input.type}
                     </>
                   );
