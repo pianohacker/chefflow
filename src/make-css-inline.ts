@@ -1,5 +1,15 @@
 const propertyAllowlist: Partial<Record<keyof HTMLElementTagNameMap | "*", string[]>> = {
-  "*": ["background", "border", "font-family", "font-size", "font-weight", "padding", "vertical-align"],
+  "*": [
+    "background",
+    "border",
+    "font-family",
+    "font-size",
+    "font-style",
+    "font-weight",
+    "padding",
+    "text-align",
+    "vertical-align",
+  ],
   table: ["border-collapse"],
 };
 
@@ -24,7 +34,7 @@ export default function makeCssInline(node: Node): Node {
 
         if (!value || value == "auto") continue;
 
-        newElement.style.setProperty(property, value);
+        newElement.style.setProperty(property, property == "font-weight" && parseInt(value) >= 600 ? "700" : value);
       }
 
       return newElement;

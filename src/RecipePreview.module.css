@@ -37,9 +37,16 @@
       border-width: 1px;
       border-style: solid;
       border-color: #888;
-      padding: 0.3em 0.6em;
-      text-align: left;
+      padding: 0.2em 0.4em;
+      text-align: right;
       vertical-align: middle;
+
+      &.ingredient {
+      }
+
+      &.step {
+        font-style: italic;
+      }
     }
 
     .recipeSource td {
@@ -64,7 +71,7 @@
 
       td {
         position: relative;
-        padding-right: 0.6em;
+        padding-right: 1.2em;
         border-left-style: none;
         border-right-style: none;
 

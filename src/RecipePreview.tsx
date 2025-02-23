@@ -32,7 +32,6 @@ function makeNode(input: Ingredient | Step): Node {
   if (isIngredient(input)) {
     return { size: 1, input: input, children: [], extent: 1 };
   } else {
-    if (!input.inputs) console.trace("makeNode", input);
     const children = input.inputs.map((input) => makeNode(input));
     const size = children.reduce((accum, input) => accum + input.size, 0);
     return { size: size, input, children, extent: 1 };
@@ -73,8 +72,10 @@ function fillGrid(grid: Grid): void {
       const node = grid[x][y];
 
       if (node) {
-        if (isNode(node)) node.extent += emptySlots;
-        emptySlots = 0;
+        if (isNode(node) && x == 0) {
+          node.extent += emptySlots;
+          emptySlots = 0;
+        }
       } else {
         emptySlots++;
       }
@@ -147,6 +148,7 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
 
                 const { input, extent, size } = node;
                 let inputNode;
+                let className;
 
                 if (isIngredient(input)) {
                   const { amount, unit } = input;
@@ -175,12 +177,14 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
                       {input.type}
                     </>
                   );
+                  className = classes.ingredient;
                 } else {
                   inputNode = <>{input.desc}</>;
+                  className = classes.step;
                 }
 
                 return (
-                  <td colSpan={extent} rowSpan={size}>
+                  <td className={className} colSpan={extent} rowSpan={size}>
                     {inputNode}
                   </td>
                 );
