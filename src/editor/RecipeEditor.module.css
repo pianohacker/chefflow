@@ -20,7 +20,7 @@
 }
 
 .resultNameGutter :global(.cm-gutterElement) {
-  font-family: Solway;
+  font-family: var(--font-family);
   min-width: 6em;
   padding-right: 0.5em;
   text-align: right;
