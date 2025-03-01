@@ -21,9 +21,13 @@
 
 .resultNameGutter :global(.cm-gutterElement) {
   font-family: Solway;
-  min-width: 8em;
+  min-width: 6em;
   padding-right: 0.5em;
   text-align: right;
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 
   span {
     cursor: pointer;
