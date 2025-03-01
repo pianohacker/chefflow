@@ -63,6 +63,10 @@
       }
     }
 
+    &.export {
+      font-size: 12px;
+    }
+
     &:not(.export) {
       border-width: 1px;
       border-left-style: solid;

@@ -13,7 +13,7 @@ const propertyAllowlist: Partial<Record<keyof HTMLElementTagNameMap | "*", strin
   table: ["border-collapse"],
 };
 
-export default function makeCssInline(node: Node): Node {
+export default function exportForCopyPaste(node: Node): Node {
   switch (node.nodeType) {
     case Node.ELEMENT_NODE:
       const element = node as Element;
@@ -21,7 +21,7 @@ export default function makeCssInline(node: Node): Node {
 
       const newElement = node.cloneNode(false) as HTMLElement;
 
-      newElement.replaceChildren(...Array.from(node.childNodes).map((n) => makeCssInline(n)));
+      newElement.replaceChildren(...Array.from(node.childNodes).map((n) => exportForCopyPaste(n)));
 
       newElement.removeAttribute("id");
       newElement.removeAttribute("class");

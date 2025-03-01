@@ -4,7 +4,7 @@ import { Ingredient, isIngredient, parseRecipe, Recipe, Step } from "./parse";
 
 import sharedClasses from "./shared.module.css";
 import classes from "./RecipePreview.module.css";
-import makeCssInline from "./make-css-inline";
+import exportForCopyPaste from "./export-for-copy-paste";
 import { encodeRecipe } from "./encoding";
 
 const DENOMINATORS = [2, 3, 4, 6, 8, 16];
@@ -126,7 +126,9 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
     diagramRef.current.classList.add(classes.export);
     navigator.clipboard.write([
       new ClipboardItem({
-        "text/html": new Blob([(makeCssInline(diagramRef.current) as HTMLElement).outerHTML], { type: "text/html" }),
+        "text/html": new Blob([(exportForCopyPaste(diagramRef.current) as HTMLElement).outerHTML], {
+          type: "text/html",
+        }),
       }),
     ]);
     diagramRef.current.classList.remove(classes.export);
