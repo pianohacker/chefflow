@@ -96,6 +96,24 @@
           left: -0.9em;
           top: 0;
         }
+
+        &.inputStatus__soon {
+          color: rgba(0, 0, 0, 0.6);
+          border-color: rgba(104, 104, 104, 0.6);
+
+          &::before {
+            filter: brightness(1.2);
+          }
+        }
+
+        &.inputStatus__later {
+          color: rgba(0, 0, 0, 0.3);
+          border-color: rgba(104, 104, 104, 0.3);
+
+          &::before {
+            filter: brightness(1.4);
+          }
+        }
       }
     }
   }

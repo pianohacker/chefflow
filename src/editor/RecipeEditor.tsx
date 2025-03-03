@@ -223,9 +223,11 @@ function chefflowLinter(view: EditorView): readonly Diagnostic[] {
 export function RecipeEditor({
   recipeText,
   setRecipeText,
+  playing,
 }: {
   recipeText: string;
   setRecipeText: (x: string) => any;
+  playing: boolean;
 }): JSX.Element {
   const onPaste = useCallback(
     (event: React.ClipboardEvent) => {
@@ -248,7 +250,8 @@ export function RecipeEditor({
 
   return (
     <CodeMirror
-      className={classes.recipeEditor}
+      readOnly={playing}
+      className={`${classes.recipeEditor} ${playing ? classes.playing : ""}`.trim()}
       value={recipeText}
       basicSetup={{
         lineNumbers: false,

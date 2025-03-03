@@ -17,6 +17,13 @@
       outline-style: none;
     }
   }
+
+  &.playing {
+    opacity: 0.8;
+    .resultNameGutter :global(.cm-gutterElement) {
+      display: none;
+    }
+  }
 }
 
 .resultNameGutter :global(.cm-gutterElement) {
