@@ -1,4 +1,4 @@
-.recipePreview {
+.recipeDiagram {
   align-self: center;
   margin-top: 1em;
   max-width: 100%;
@@ -10,13 +10,18 @@
     margin: 0.6em 0;
 
     button {
-      border-width: 1px;
-      border-style: solid;
-      border-color: #888;
-      font-family: var(--font-family);
-      font-size: inherit;
       margin-right: 0.6em;
       padding: 0.3em 0.6em;
+
+      background: white;
+      color: black;
+      border-width: 1px;
+      border-style: solid;
+      border-color: var(--cf-blue);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+
+      font-family: var(--font-family);
+      font-size: inherit;
     }
 
     @media print {
@@ -80,7 +85,7 @@
         border-right-style: none;
 
         &:not(:first-child)::before {
-          background: url(./assets/brace.svg);
+          background: url(../assets/brace.svg);
           background-repeat: no-repeat;
           background-size: 100% 100%;
           content: " ";

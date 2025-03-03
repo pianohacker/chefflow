@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
-import { Ingredient, isIngredient, parseRecipe, Recipe, Step } from "./parse";
+import { Ingredient, isIngredient, parseRecipe, Recipe, Step } from "../parse";
 
-import sharedClasses from "./shared.module.css";
-import classes from "./RecipePreview.module.css";
+import sharedClasses from "../shared.module.css";
+import classes from "./RecipeDiagram.module.css";
 import exportForCopyPaste from "./export-for-copy-paste";
-import { encodeRecipe } from "./encoding";
+import { encodeRecipe } from "../encoding";
 
 const DENOMINATORS = [2, 3, 4, 6, 8, 16];
 
@@ -83,7 +83,7 @@ function fillGrid(grid: Grid): void {
   }
 }
 
-export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Element {
+export function RecipeDiagram({ recipeText }: { recipeText: string }): JSX.Element {
   const debouncedRecipeText = useDebounce(recipeText, 250);
 
   const [parsedRecipe, setParsedRecipe] = useState<Recipe | null>(null);
@@ -139,7 +139,7 @@ export function RecipePreview({ recipeText }: { recipeText: string }): JSX.Eleme
   }, []);
 
   return (
-    <div className={classes.recipePreview}>
+    <div className={classes.recipeDiagram}>
       <table ref={diagramRef}>
         <tbody>
           {range(recipeGrid[0] ? recipeGrid[0].length : 0).map((y) => (
