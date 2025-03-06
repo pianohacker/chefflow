@@ -70,6 +70,10 @@ function fillGrid(grid: Grid): void {
   }
 }
 
+function makeGrid(width: number, height: number): any[][] {
+  return range(width).map(() => new Array(height));
+}
+
 export function RecipeDiagram({
   recipeText,
   playing,
@@ -93,11 +97,10 @@ export function RecipeDiagram({
     if (!parsedRecipe || !parsedRecipe.results.length) return [];
 
     const recipeTrees = parsedRecipe.results.map(makeNode);
-    const depth = Math.max(...recipeTrees.map(maxDepth));
 
-    const recipeGrid: Grid = range(depth).map(
-      () => new Array(recipeTrees.map(({ size }) => size).reduce((accum, size) => accum + size, 0)),
-    );
+    const depth = Math.max(...recipeTrees.map(maxDepth));
+    const totalSize = recipeTrees.map(({ size }) => size).reduce((accum, size) => accum + size, 0);
+    const recipeGrid = makeGrid(depth, totalSize) as Grid;
 
     let y = 0;
 
@@ -134,7 +137,7 @@ export function RecipeDiagram({
   }, []);
 
   type NodeStatus = "done" | "active" | "soon" | "later";
-  const [nodeStatus, setNodeStatus] = useState<Record<string, NodeStatus>>({});
+  const [nodeStatus, setNodeStatus] = useState<NodeStatus[][]>([]);
 
   const onClickPlay = useCallback(() => {
     if (!recipeGrid[1] || !recipeGrid[1].length) {
@@ -143,19 +146,19 @@ export function RecipeDiagram({
     }
 
     if (playing) {
-      setNodeStatus({});
+      setNodeStatus([]);
       setPlaying(false);
       return;
     }
 
-    const newNodeStatus: typeof nodeStatus = {};
+    const newNodeStatus = makeGrid(recipeGrid.length, recipeGrid[0].length) as typeof nodeStatus;
 
     for (let x = 0; x < 3 && x < recipeGrid.length; x++) {
       for (let y = 0; y < recipeGrid[0].length; y++) {
         const node = recipeGrid[x][y];
 
         if (isNode(node)) {
-          newNodeStatus[[x, y].toString()] = x == 2 ? "soon" : "active";
+          newNodeStatus[x][y] = x == 2 ? "soon" : "active";
         }
       }
     }
@@ -163,6 +166,114 @@ export function RecipeDiagram({
     setNodeStatus(newNodeStatus);
     setPlaying(true);
   }, [playing, setPlaying, recipeGrid]);
+
+  const onClickNode = useCallback(
+    (x: number, y: number) => {
+      if (!playing) return;
+
+      const node = recipeGrid[x][y];
+      if (!isNode(node)) return;
+
+      const newNodeStatus = nodeStatus.map((x) => Array.from(x));
+
+      const status = nodeStatus[x][y] || "later";
+
+      switch (status) {
+        case "done":
+          {
+            newNodeStatus[x][y] = "active";
+            // Reactivate forward
+            let ay = y;
+            for (let ax = x + 1; ax < newNodeStatus.length; ax++) {
+              for (; ay >= 0; ay--) {
+                if (isNode(recipeGrid[ax][ay])) break;
+              }
+
+              const aStatus = newNodeStatus[ax][ay];
+              if (aStatus != "done") break;
+
+              newNodeStatus[ax][ay] = "active";
+            }
+          }
+          break;
+
+        case "active":
+          {
+            newNodeStatus[x][y] = "done";
+            // Finish backward
+            for (let dx = x - 1; dx >= 0; dx--) {
+              for (let dy = y; dy <= y + node.size - 1; dy++) {
+                if (isNode(recipeGrid[dx][dy])) {
+                  newNodeStatus[dx][dy] = "done";
+                }
+              }
+            }
+          }
+          break;
+
+        case "soon":
+          break;
+
+        case "later":
+          break;
+      }
+
+      let allActiveX: number | null = null;
+      for (let x = 0; x < newNodeStatus.length; x++) {
+        let activeCount = 0;
+        let totalCount = 0;
+
+        for (let y = 0; y < newNodeStatus[0].length; y++) {
+          if (isNode(recipeGrid[x][y])) {
+            if (newNodeStatus[x][y] == "active") {
+              activeCount++;
+            }
+            totalCount++;
+          }
+        }
+
+        if (activeCount && activeCount == totalCount) {
+          allActiveX = x;
+          break;
+        }
+      }
+
+      if (allActiveX == null) {
+        let firstSoonX: number | null = null;
+        for (let x = 0; x < newNodeStatus.length; x++) {
+          let foundSoon = false;
+          for (let y = 0; y < newNodeStatus[0].length; y++) {
+            if (newNodeStatus[x][y] == "soon") {
+              foundSoon = true;
+              break;
+            }
+          }
+
+          if (foundSoon) {
+            firstSoonX = x;
+            break;
+          }
+        }
+
+        if (firstSoonX != null) {
+          for (let y = 0; y < newNodeStatus[0].length; y++) {
+            if (newNodeStatus[firstSoonX][y] == "soon") {
+              newNodeStatus[firstSoonX][y] = "active";
+            }
+          }
+
+          if (firstSoonX + 1 < newNodeStatus.length) {
+            for (let y = 0; y < newNodeStatus[0].length; y++) {
+              newNodeStatus[firstSoonX + 1][y] = "soon";
+            }
+          }
+        }
+      }
+
+      setNodeStatus(newNodeStatus);
+    },
+    [playing, recipeGrid, nodeStatus, setNodeStatus],
+  );
 
   return (
     <div className={classes.recipeDiagram}>
@@ -219,13 +330,18 @@ export function RecipeDiagram({
                 let statusClassName = "";
 
                 if (playing) {
-                  const status = nodeStatus[[x, y].toString()] || "later";
+                  const status = nodeStatus[x][y] || "later";
 
                   statusClassName = classes[`inputStatus__${status}`] || "";
                 }
 
                 return (
-                  <td className={`${className} ${statusClassName}`.trim()} colSpan={extent} rowSpan={size}>
+                  <td
+                    className={`${className} ${statusClassName}`.trim()}
+                    colSpan={extent}
+                    rowSpan={size}
+                    onClick={() => onClickNode(x, y)}
+                  >
                     {inputNode}
                   </td>
                 );
