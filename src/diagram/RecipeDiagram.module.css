@@ -1,8 +1,15 @@
 .recipeDiagram {
   align-self: center;
-  margin-top: 1em;
   max-width: 100%;
   overflow-x: auto;
+
+  &.playing {
+    user-select: none;
+
+    td {
+      cursor: pointer;
+    }
+  }
 
   .controls {
     display: flex;
@@ -85,17 +92,25 @@
         border-right-style: none;
 
         &:not(:first-child)::before {
-          background: url(../assets/brace.svg);
-          background-repeat: no-repeat;
-          background-size: 100% 100%;
-          content: " ";
           display: block;
           position: absolute;
           width: 0.9em;
           height: 100%;
           left: -0.9em;
           top: 0;
+
+          content: " ";
+
+          background: url(../assets/brace.svg);
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
+
+          transition: filter 500ms;
         }
+
+        transition:
+          color 250ms,
+          border-color 250ms;
 
         &.inputStatus__soon {
           color: rgba(0, 0, 0, 0.45);

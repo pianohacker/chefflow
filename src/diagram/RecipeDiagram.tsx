@@ -149,8 +149,12 @@ export function RecipeDiagram({
   }, [diagramRef, recipeText, recipeGrid.length]);
 
   const onClickPrint = useCallback(() => {
-    window.print();
-  }, []);
+    setPlaying(false);
+
+    setTimeout(() => {
+      window.print();
+    }, 0);
+  }, [setPlaying]);
 
   type NodeStatus = "done" | "active" | "soon" | "later";
   const [nodeStatus, setNodeStatus] = useState<NodeStatus[][]>([]);
@@ -292,7 +296,7 @@ export function RecipeDiagram({
   );
 
   return (
-    <div className={classes.recipeDiagram}>
+    <div className={`${classes.recipeDiagram} ${playing ? classes.playing : ""}`.trim()}>
       <div className={classes.controls}>
         <button className={classes.playButton} onClick={onClickPlay}>
           {playing ? "Stop" : "Play"}
