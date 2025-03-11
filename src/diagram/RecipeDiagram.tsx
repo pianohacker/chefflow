@@ -114,14 +114,28 @@ export function RecipeDiagram({
     return recipeGrid;
   }, [parsedRecipe]);
 
-  const recipeSource = useMemo(() => encodeRecipe(recipeText), [recipeText]);
-
   const diagramRef = useRef<HTMLTableElement | null>(null);
 
   const onClickCopy = useCallback(() => {
     if (!diagramRef.current) return;
 
     diagramRef.current.classList.add(classes.export);
+
+    const tr = document.createElement("tr");
+    tr.classList.add(classes.recipeSource);
+    diagramRef.current.appendChild(tr);
+
+    const td = document.createElement("td");
+    td.setAttribute("colspan", recipeGrid.length.toString());
+    tr.appendChild(td);
+
+    const recipeSource = encodeRecipe(recipeText);
+    const a = document.createElement("a");
+    const linkContents = `${window.location.origin}/#${recipeSource}`;
+    a.setAttribute("href", linkContents);
+    a.innerText = linkContents;
+    td.append(document.createTextNode("Made with Chefflow "), a);
+
     navigator.clipboard.write([
       new ClipboardItem({
         "text/html": new Blob([(exportForCopyPaste(diagramRef.current) as HTMLElement).outerHTML], {
@@ -129,8 +143,10 @@ export function RecipeDiagram({
         }),
       }),
     ]);
+
+    tr.remove();
     diagramRef.current.classList.remove(classes.export);
-  }, [diagramRef]);
+  }, [diagramRef, recipeText, recipeGrid.length]);
 
   const onClickPrint = useCallback(() => {
     window.print();
@@ -348,12 +364,6 @@ export function RecipeDiagram({
               })}
             </tr>
           ))}
-          <tr className={classes.recipeSource}>
-            <td colSpan={recipeGrid.length}>
-              Made with Chefflow:{" "}
-              <a href={`${window.location.origin}/#${recipeSource}`}>{`${window.location.origin}/#${recipeSource}`}</a>
-            </td>
-          </tr>
         </tbody>
       </table>
       <div className={classes.controls}>
