@@ -1,78 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
-import { Ingredient, isIngredient, parseRecipe, Recipe, Step } from "../parse";
+import { isIngredient, parseRecipe, Recipe } from "../parser";
+import { range } from "../utils";
 
 import sharedClasses from "../shared.module.css";
 import classes from "./RecipeDiagram.module.css";
 import exportForCopyPaste from "./export-for-copy-paste";
 import { encodeRecipe } from "../encoding";
+import { isNode, makeGrid, makeGridFromRecipe } from "../parser/grid";
 
 const DENOMINATORS = [2, 3, 4, 6, 8, 16];
-
-function range(start: number, stop?: number, step: number = 1) {
-  if (stop == null) {
-    stop = start;
-    start = 0;
-  }
-
-  return [...Array(stop - start).keys()].map((i) => start + i * step);
-}
-
-interface Node {
-  size: number;
-  extent: number;
-  input: Ingredient | Step;
-  children: Node[];
-}
-function isNode(n: any): n is Node {
-  return typeof n === "object" && "size" in n && "extent" in n;
-}
-
-function makeNode(input: Ingredient | Step): Node {
-  if (isIngredient(input)) {
-    return { size: 1, input: input, children: [], extent: 1 };
-  } else {
-    const children = input.inputs.map((input) => makeNode(input));
-    const size = children.reduce((accum, input) => accum + input.size, 0);
-    return { size: size, input, children, extent: 1 };
-  }
-}
-
-function maxDepth(node: Node): number {
-  return node.children.reduce((accum, input) => Math.max(accum, maxDepth(input) + 1), 1);
-}
-
-type Grid = (Node | boolean | null)[][];
-
-function placeInGrid(node: Node, grid: Grid, x: number, y: number) {
-  let childY = y;
-  for (const input of node.children) {
-    placeInGrid(input, grid, x - 1, childY);
-    childY += input.size;
-  }
-
-  grid[x][y] = node;
-  for (let fillY = y + 1; fillY < y + node.size; fillY++) grid[x][fillY] = true;
-}
-
-function fillGrid(grid: Grid): void {
-  for (let y = 0; y < grid[0].length; y++) {
-    let curNode;
-    for (let x = grid.length - 1; x >= 0; x--) {
-      const node = grid[x][y];
-
-      if (node) {
-        curNode = node;
-      } else if (curNode && isNode(curNode)) {
-        curNode.extent++;
-      }
-    }
-  }
-}
-
-function makeGrid(width: number, height: number): any[][] {
-  return range(width).map(() => new Array(height));
-}
 
 export function RecipeDiagram({
   recipeText,
@@ -96,22 +33,7 @@ export function RecipeDiagram({
   const recipeGrid = useMemo(() => {
     if (!parsedRecipe || !parsedRecipe.results.length) return [];
 
-    const recipeTrees = parsedRecipe.results.map(makeNode);
-
-    const depth = Math.max(...recipeTrees.map(maxDepth));
-    const totalSize = recipeTrees.map(({ size }) => size).reduce((accum, size) => accum + size, 0);
-    const recipeGrid = makeGrid(depth, totalSize) as Grid;
-
-    let y = 0;
-
-    for (const recipeTree of recipeTrees) {
-      placeInGrid(recipeTree, recipeGrid, depth - 1, y);
-      y += recipeTree.size;
-    }
-
-    fillGrid(recipeGrid);
-
-    return recipeGrid;
+    return makeGridFromRecipe(parsedRecipe);
   }, [parsedRecipe]);
 
   const diagramRef = useRef<HTMLTableElement | null>(null);

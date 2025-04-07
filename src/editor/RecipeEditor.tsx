@@ -9,7 +9,7 @@ import classes from "./RecipeEditor.module.css";
 import { parser as chefflowParser } from "./chefflow.grammar.ts";
 import { canonUnits } from "../units";
 import { decodeRecipe } from "../encoding";
-import { isIngredient, parseRecipe, Recipe, walkInputs } from "../parse";
+import { isIngredient, parseRecipe, Recipe, walkInputs } from "../parser";
 import { Diagnostic, linter } from "@codemirror/lint";
 import memoize from "memoize";
 import QuickLRU from "quick-lru";
