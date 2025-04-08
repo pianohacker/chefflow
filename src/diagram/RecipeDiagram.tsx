@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
-import { isIngredient, parseRecipe, Recipe } from "../parser";
+import { isIngredient, parseRecipe } from "../parser";
 import { range } from "../utils";
 
 import sharedClasses from "../shared.module.css";
 import classes from "./RecipeDiagram.module.css";
 import exportForCopyPaste from "./export-for-copy-paste";
 import { encodeRecipe } from "../encoding";
-import { isNode, makeGrid, makeGridFromRecipe } from "../parser/grid";
+import { fillGrid, isNode, makeGrid, makeGridFromRecipe } from "../parser/grid";
 
 const DENOMINATORS = [2, 3, 4, 6, 8, 16];
 
@@ -22,18 +22,25 @@ export function RecipeDiagram({
 }): JSX.Element {
   const debouncedRecipeText = useDebounce(recipeText, 250);
 
-  const [parsedRecipe, setParsedRecipe] = useState<Recipe | null>(null);
+  const [parsedRecipe, setParsedRecipe] = useState<ReturnType<typeof parseRecipe> | null>(null);
 
   useEffect(() => {
-    const { recipe, errors } = parseRecipe(debouncedRecipeText);
+    const result = parseRecipe(debouncedRecipeText);
 
-    if (!errors.length) setParsedRecipe(recipe);
+    if (!result.errors.length) setParsedRecipe(result);
   }, [debouncedRecipeText]);
 
   const recipeGrid = useMemo(() => {
-    if (!parsedRecipe || !parsedRecipe.results.length) return [];
+    if (!parsedRecipe) return [];
 
-    return makeGridFromRecipe(parsedRecipe);
+    if ("recipe" in parsedRecipe) {
+      if (!parsedRecipe.recipe.results.length) return [];
+      return makeGridFromRecipe(parsedRecipe.recipe);
+    } else {
+      const { grid } = parsedRecipe;
+      fillGrid(grid);
+      return grid;
+    }
   }, [parsedRecipe]);
 
   const diagramRef = useRef<HTMLTableElement | null>(null);

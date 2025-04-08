@@ -117,7 +117,7 @@ const noValidResultName: unique symbol = Symbol("noValidResultName");
 type LineNames = Record<number, string | typeof noValidResultName>;
 
 const recipeUpToSelectionState = StateField.define<{
-  recipe: Recipe;
+  recipe: Recipe | null;
   lineNames: LineNames;
 }>({
   create() {
@@ -126,7 +126,10 @@ const recipeUpToSelectionState = StateField.define<{
   update({ recipe: oldRecipe, lineNames: oldLineNames }, { state, newSelection }) {
     const selectionLine = state.doc.lineAt(newSelection.ranges[0].from);
 
-    const { recipe } = memoizedParseRecipe(state.sliceDoc(0, selectionLine.from));
+    const result = memoizedParseRecipe(state.sliceDoc(0, selectionLine.from));
+    if ("grid" in result) return { recipe: null, lineNames: {} };
+
+    const { recipe } = result;
     if (recipe === oldRecipe) return { recipe: oldRecipe, lineNames: oldLineNames };
 
     const lineNames: LineNames = {};
