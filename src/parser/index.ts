@@ -109,12 +109,12 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
       };
       y += step.size;
     } else if (ingredient) {
-      column.push({
+      column[y] = {
         size: 1,
         extent: 1,
         input: { ...ingredient, lineNum },
         children: [],
-      });
+      };
       y += 1;
     } else {
       errors.push({ lineNum, error: "Unrecognized line" });
@@ -122,6 +122,11 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
 
     lastLineNum = lineNum;
   }
+
+  // This is important because other functions use the first column's height to determine the entire
+  // grid's height
+  const maxColumnHeight = grid.reduce((accum, column) => Math.max(accum, column.length), 0);
+  if (grid[0].length < maxColumnHeight) grid[0].length = maxColumnHeight;
 
   return { grid, errors };
 }

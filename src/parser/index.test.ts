@@ -319,6 +319,33 @@ describe("parseRecipe()", () => {
       }),
     },
     {
+      desc: "grid recipe with longer second column",
+      input: `
+      Manual:
+
+      1 tbsp berry snozz
+      4 tsp snozzberries
+
+      fandangle (2)
+      4 tbsp raspberries
+      `,
+      result: makeGridResult({
+        grid: [
+          [
+            { size: 1, lineNum: 4, amount: 1, unit: "tbsp", type: "berry snozz" },
+            { size: 1, lineNum: 5, amount: 4, unit: "tsp", type: "snozzberries" },
+            ,
+          ],
+          [
+            { size: 2, lineNum: 7, desc: "fandangle" },
+            ,
+            { size: 1, lineNum: 8, amount: 4, unit: "tbsp", type: "raspberries" },
+          ],
+        ],
+        errors: [],
+      }),
+    },
+    {
       desc: "grid recipe with multiple steps per column",
       input: `
       Manual:
