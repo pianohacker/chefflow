@@ -134,9 +134,9 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
 export function parseRecipe(
   input: string,
 ): { recipe: Recipe; errors: LineError[] } | { grid: Grid; errors: LineError[] } {
-  const errors: LineError[] = [];
-
   if (input.trimStart().match(GRID_MARKER_RE)) return parseGridRecipe(input);
+
+  const errors: LineError[] = [];
 
   const lines = input
     .split("\n")

@@ -7,7 +7,7 @@ import sharedClasses from "../shared.module.css";
 import classes from "./RecipeDiagram.module.css";
 import exportForCopyPaste from "./export-for-copy-paste";
 import { encodeRecipe } from "../encoding";
-import { fillGrid, isNode, makeGrid, makeGridFromRecipe } from "../parser/grid";
+import { exportGrid, fillGrid, isNode, makeGrid, makeGridFromRecipe } from "../parser/grid";
 
 const DENOMINATORS = [2, 3, 4, 6, 8, 16];
 
@@ -26,6 +26,7 @@ export function RecipeDiagram({
 
   useEffect(() => {
     const result = parseRecipe(debouncedRecipeText);
+    if ("grid" in result) fillGrid(result.grid);
 
     if (!result.errors.length) setParsedRecipe(result);
   }, [debouncedRecipeText]);
@@ -38,7 +39,9 @@ export function RecipeDiagram({
       return makeGridFromRecipe(parsedRecipe.recipe);
     } else {
       const { grid } = parsedRecipe;
-      fillGrid(grid);
+      console.group("grid");
+      console.log({ grid: JSON.parse(JSON.stringify(grid)) });
+      console.groupEnd();
       return grid;
     }
   }, [parsedRecipe]);
@@ -224,6 +227,16 @@ export function RecipeDiagram({
     [playing, recipeGrid, nodeStatus, setNodeStatus],
   );
 
+  const isTreeRecipe = "recipe" in (parsedRecipe || {});
+  const onClickManual = useCallback(() => {
+    if (!isTreeRecipe) return;
+
+    const manualUrl = new URL(window.location.toString());
+    manualUrl.hash = "#" + encodeRecipe(exportGrid(recipeGrid));
+
+    window.open(manualUrl, "_blank");
+  }, [isTreeRecipe, recipeGrid]);
+
   return (
     <div className={`${classes.recipeDiagram} ${playing ? classes.playing : ""}`.trim()}>
       <div className={classes.controls}>
@@ -306,6 +319,11 @@ export function RecipeDiagram({
         <button className={classes.printButton} onClick={onClickPrint}>
           Print
         </button>
+        {!("grid" in (parsedRecipe || {})) && (
+          <button className={classes.manualButton} onClick={onClickManual}>
+            Manual Version
+          </button>
+        )}
       </div>
     </div>
   );

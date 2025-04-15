@@ -74,18 +74,21 @@ export function makeGridFromRecipe(recipe: Recipe): Grid {
 
   fillGrid(recipeGrid);
 
-  const result = [];
-  for (let x = 0; x < recipeGrid.length; x++) {
-    const length = recipeGrid[x].findLastIndex((el) => !!el) + 1;
+  return recipeGrid;
+}
+
+export function exportGrid(grid: Grid): string {
+  const result = ["Manual:\n\n"];
+  for (let x = 0; x < grid.length; x++) {
+    const length = grid[x].findLastIndex((el) => !!el) + 1;
     for (let y = 0; y < length; y++) {
-      const el = recipeGrid[x][y];
+      const el = grid[x][y];
       console.log({ x, y, el });
       if (isNode(el)) {
         if (isStep(el.input)) {
-          result.push([el.size != 1 ? `(${el.size})` : "", el.input.desc].join(" ").trim());
+          result.push(`${el.input.desc} (${el.size})`);
         } else if (isIngredient(el.input)) {
           result.push(
-            el.size != 1 ? `(${el.size}) ` : "",
             el.input.amount ? `${el.input.amount} ` : "",
             el.input.unit ? `${el.input.unit} ` : "",
             el.input.type,
@@ -99,7 +102,5 @@ export function makeGridFromRecipe(recipe: Recipe): Grid {
     result.push("\n");
   }
 
-  console.log(result.join(""));
-
-  return recipeGrid;
+  return result.join("").trim();
 }
