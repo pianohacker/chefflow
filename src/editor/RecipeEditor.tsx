@@ -44,13 +44,11 @@ const cmTheme = EditorView.theme({
     fontSize: "1.2rem",
   },
   ".cm-scroller": {
+    background: "white",
     fontFamily: "var(--font-family)",
   },
   ".cm-editor.cm-focused": {
     outlineStyle: "none",
-  },
-  ".cm-content": {
-    background: "white",
   },
   ".cm-gutters": {
     background: "transparent",
@@ -67,6 +65,9 @@ const cmTheme = EditorView.theme({
   },
   ".cm-lineNumbers .cm-activeLineGutter": {
     color: "#242424",
+  },
+  "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, ::selection": {
+    backgroundColor: "var(--cf-blue)",
   },
 });
 

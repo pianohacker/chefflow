@@ -52,6 +52,8 @@ export function walkInputs<T>(results: Step[], fn: (input: Step | Ingredient) =>
 const UNIT_RE = Array.from(knownUnits).join("|");
 const INGREDIENT_RE = new RegExp(`(?:(\\d+/\\d+|\\d+|\\.\\d+|\\d+\\.\\d+)\\s+)?(?:(${UNIT_RE})\\s+)?(.*)`);
 const GRID_MARKER_RE = /^(manual|nha|grid):/i;
+const GRID_COLUMN_SEP_RE = /^(--)$/i;
+const GRID_EMPTY_LINE_RE = /^(|blank)$/i;
 
 function parseIngredient(inputText: string): Ingredient | null {
   const ingredientMatch = INGREDIENT_RE.exec(inputText);
@@ -76,24 +78,26 @@ function parseIngredient(inputText: string): Ingredient | null {
 function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
   const errors: LineError[] = [];
 
-  const lines = input
-    .split("\n")
-    .map((line, i): [string, number] => [line.trim(), i + 1])
-    .filter(([line]) => !!line);
+  const lines = input.split("\n").map((line, i): [string, number] => [line.trim(), i + 1]);
 
   const firstLineIdx = lines.findIndex(([line]) => line && !line.match(GRID_MARKER_RE));
   let column: Grid[0] = [];
   let y = 0;
-  const grid: Grid = [column];
+  const grid: Grid = [];
 
-  if (firstLineIdx == -1) return { grid, errors };
+  if (firstLineIdx == -1) return { grid: [[]], errors };
 
-  let lastLineNum = lines[firstLineIdx][1];
   for (const [line, lineNum] of lines.slice(firstLineIdx)) {
-    if (lineNum - lastLineNum > 1) {
+    if (line.match(GRID_COLUMN_SEP_RE)) {
       column = [];
       y = 0;
       grid.push(column);
+      continue;
+    }
+
+    if (line.match(GRID_EMPTY_LINE_RE)) {
+      y++;
+      continue;
     }
 
     const stepMatch = /^(.*)\((\d+)\)$/.exec(line);
@@ -124,9 +128,9 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
     } else {
       errors.push({ lineNum, error: "Unrecognized line" });
     }
-
-    lastLineNum = lineNum;
   }
+
+  if (grid.length == 0) grid.push([]);
 
   // This is important because other functions use the first column's height to determine the entire
   // grid's height

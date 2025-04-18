@@ -97,10 +97,13 @@
           width: 0.9em;
           height: 100%;
           left: -0.9em;
-          top: 0;
+          top: -1px;
 
           content: " ";
 
+          border-width: 1px;
+          border-style: solid none;
+          border-color: #888;
           background: url(../assets/brace.svg);
           background-repeat: no-repeat;
           background-size: 100% 100%;

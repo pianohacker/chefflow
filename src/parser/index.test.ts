@@ -290,7 +290,7 @@ describe("parseRecipe()", () => {
     {
       desc: "empty grid recipe",
       input: `
-      Manual:
+      Grid:
 
       `,
       result: makeGridResult({
@@ -301,11 +301,11 @@ describe("parseRecipe()", () => {
     {
       desc: "basic grid recipe",
       input: `
-      Manual:
-
+      Grid:
+      --
       1 tbsp berry snozz
       4 tsp snozzberries
-
+      --
       fandangle (2)
       `,
       result: makeGridResult({
@@ -314,7 +314,7 @@ describe("parseRecipe()", () => {
             { size: 1, lineNum: 4, amount: 1, unit: "tbsp", type: "berry snozz" },
             { size: 1, lineNum: 5, amount: 4, unit: "tsp", type: "snozzberries" },
           ],
-          [{ size: 2, lineNum: 7, desc: "fandangle" }],
+          [{ size: 2, lineNum: 7, desc: "fandangle" }, true],
         ],
         errors: [],
       }),
@@ -322,11 +322,11 @@ describe("parseRecipe()", () => {
     {
       desc: "grid recipe with longer second column",
       input: `
-      Manual:
-
+      Grid:
+      --
       1 tbsp berry snozz
       4 tsp snozzberries
-
+      --
       fandangle (2)
       4 tbsp raspberries
       `,
@@ -349,15 +349,15 @@ describe("parseRecipe()", () => {
     {
       desc: "grid recipe with multiple steps per column",
       input: `
-      Manual:
-
+      Grid:
+      --
       1 tbsp berry snozz
       4 tsp snozzberries
       4 lb normal berries
-
+      --
       fandangle (2)
       blend(1)
-
+      --
       smush (3)
       `,
       result: makeGridResult({
@@ -368,7 +368,34 @@ describe("parseRecipe()", () => {
             { size: 1, lineNum: 6, amount: 4, unit: "lb", type: "normal berries" },
           ],
           [{ size: 2, lineNum: 8, desc: "fandangle" }, true, { size: 1, lineNum: 9, desc: "blend" }],
-          [{ size: 3, lineNum: 11, desc: "smush" }],
+          [{ size: 3, lineNum: 11, desc: "smush" }, true, true],
+        ],
+        errors: [],
+      }),
+    },
+    {
+      desc: "grid recipe with blanks at start of column",
+      input: `
+      Grid:
+      --
+      1 tbsp berry snozz
+      4 tsp snozzberries
+      4 lb normal berries
+      --
+
+      fandangle (2)
+      --
+      smush (3)
+      `,
+      result: makeGridResult({
+        grid: [
+          [
+            { size: 1, lineNum: 4, amount: 1, unit: "tbsp", type: "berry snozz" },
+            { size: 1, lineNum: 5, amount: 4, unit: "tsp", type: "snozzberries" },
+            { size: 1, lineNum: 6, amount: 4, unit: "lb", type: "normal berries" },
+          ],
+          [, { size: 2, lineNum: 9, desc: "fandangle" }, true],
+          [{ size: 3, lineNum: 11, desc: "smush" }, true, true],
         ],
         errors: [],
       }),
