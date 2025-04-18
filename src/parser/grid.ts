@@ -83,7 +83,6 @@ export function exportGrid(grid: Grid): string {
     const length = grid[x].findLastIndex((el) => !!el) + 1;
     for (let y = 0; y < length; y++) {
       const el = grid[x][y];
-      console.log({ x, y, el });
       if (isNode(el)) {
         if (isStep(el.input)) {
           result.push(`${el.input.desc} (${el.size})`);

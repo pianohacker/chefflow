@@ -23,11 +23,12 @@ describe("parseRecipe()", () => {
     grid,
     errors,
   }: {
-    grid: ((Pick<Node, "size"> & { lineNum: number } & (Pick<Step, "desc"> | Ingredient)) | undefined)[][];
+    grid: ((Pick<Node, "size"> & { lineNum: number } & (Pick<Step, "desc"> | Ingredient)) | undefined | boolean)[][];
     errors: LineError[];
   }): ReturnType<typeof parseRecipe> => ({
     grid: grid.map((column) =>
       column.map((elem) => {
+        if (typeof elem == "boolean") return elem;
         if (elem == null) return null;
 
         const { size, lineNum, ...rest } = elem;
@@ -338,7 +339,7 @@ describe("parseRecipe()", () => {
           ],
           [
             { size: 2, lineNum: 7, desc: "fandangle" },
-            ,
+            true,
             { size: 1, lineNum: 8, amount: 4, unit: "tbsp", type: "raspberries" },
           ],
         ],
@@ -366,7 +367,7 @@ describe("parseRecipe()", () => {
             { size: 1, lineNum: 5, amount: 4, unit: "tsp", type: "snozzberries" },
             { size: 1, lineNum: 6, amount: 4, unit: "lb", type: "normal berries" },
           ],
-          [{ size: 2, lineNum: 8, desc: "fandangle" }, , { size: 1, lineNum: 9, desc: "blend" }],
+          [{ size: 2, lineNum: 8, desc: "fandangle" }, true, { size: 1, lineNum: 9, desc: "blend" }],
           [{ size: 3, lineNum: 11, desc: "smush" }],
         ],
         errors: [],

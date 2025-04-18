@@ -26,7 +26,11 @@ export function RecipeDiagram({
 
   useEffect(() => {
     const result = parseRecipe(debouncedRecipeText);
-    if ("grid" in result) fillGrid(result.grid);
+    if ("grid" in result) {
+      console.log("before fill", { recipeGrid: JSON.parse(JSON.stringify(result.grid)) });
+      fillGrid(result.grid);
+      console.log("after fill", { recipeGrid: JSON.parse(JSON.stringify(result.grid)) });
+    }
 
     if (!result.errors.length) setParsedRecipe(result);
   }, [debouncedRecipeText]);
@@ -39,9 +43,6 @@ export function RecipeDiagram({
       return makeGridFromRecipe(parsedRecipe.recipe);
     } else {
       const { grid } = parsedRecipe;
-      console.group("grid");
-      console.log({ grid: JSON.parse(JSON.stringify(grid)) });
-      console.groupEnd();
       return grid;
     }
   }, [parsedRecipe]);

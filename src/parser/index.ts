@@ -107,7 +107,12 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
         input: { desc: step.desc, inputs: [], lineNum },
         children: [],
       };
-      y += step.size;
+      y++;
+
+      for (let toFill = step.size - 1; toFill > 0; toFill--) {
+        column[y] = true;
+        y++;
+      }
     } else if (ingredient) {
       column[y] = {
         size: 1,
@@ -115,7 +120,7 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
         input: { ...ingredient, lineNum },
         children: [],
       };
-      y += 1;
+      y++;
     } else {
       errors.push({ lineNum, error: "Unrecognized line" });
     }
