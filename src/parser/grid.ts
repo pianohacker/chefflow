@@ -78,8 +78,9 @@ export function makeGridFromRecipe(recipe: Recipe): Grid {
 }
 
 export function exportGrid(grid: Grid): string {
-  const result = ["Grid:\n--\n"];
+  const result = ["Grid:\n"];
   for (let x = 0; x < grid.length; x++) {
+    result.push("--\n");
     const length = grid[x].findLastIndex((el) => !!el) + 1;
     for (let y = 0; y < length; y++) {
       const el = grid[x][y];
@@ -98,7 +99,6 @@ export function exportGrid(grid: Grid): string {
         result.push("\n");
       }
     }
-    result.push("--\n");
   }
 
   return result.join("").trim();

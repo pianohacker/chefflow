@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import appStyles from "./App.module.css";
 import { RecipeEditor } from "./editor/RecipeEditor";
 import { RecipeDiagram } from "./diagram/RecipeDiagram";
-import { decodeRecipe } from "./encoding";
+import { decodeRecipe, encodeRecipe } from "./encoding";
+import { useDebounce } from "@uidotdev/usehooks";
 
 function App() {
   const [recipeText, setRecipeText] = useState("");
@@ -18,6 +19,14 @@ function App() {
       }
     }
   }, []);
+
+  const debouncedRecipeText = useDebounce(recipeText, 250);
+  useEffect(() => {
+    const newUrl = new URL(window.location.toString());
+    newUrl.hash = encodeRecipe(debouncedRecipeText);
+
+    window.history.replaceState(null, "", newUrl);
+  }, [debouncedRecipeText]);
 
   return (
     <>
