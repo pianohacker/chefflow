@@ -133,6 +133,10 @@
             filter: brightness(1.4);
           }
         }
+
+        &.inputSelected {
+          background: var(--cf-blue);
+        }
       }
     }
   }

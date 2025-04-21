@@ -58,7 +58,7 @@ describe("parseRecipe()", () => {
       desc: "one-ingredient one-step recipe",
       input: "sautee: 5 onions",
       result: makeResult((i) => ({
-        ingredients: [i({ type: "onions", amount: 5 })],
+        ingredients: [i({ type: "onions", amount: 5, lineNum: 1 })],
         results: [{ desc: "sautee", inputs: [i(0)], lineNum: 1 }],
       })),
     },
@@ -66,7 +66,7 @@ describe("parseRecipe()", () => {
       desc: "one-ingredient one-step recipe with fractions",
       input: "sautee: 1/4 tsp salt",
       result: makeResult((i) => ({
-        ingredients: [i({ type: "salt", amount: 0.25, unit: "tsp" })],
+        ingredients: [i({ type: "salt", amount: 0.25, unit: "tsp", lineNum: 1 })],
         results: [{ desc: "sautee", inputs: [i(0)], lineNum: 1 }],
       })),
     },
@@ -74,7 +74,7 @@ describe("parseRecipe()", () => {
       desc: "multi-ingredient one-step recipe",
       input: "sautee: 5 onions, 3 radishes",
       result: makeResult((i) => ({
-        ingredients: [i({ type: "onions", amount: 5 }), i({ type: "radishes", amount: 3 })],
+        ingredients: [i({ type: "onions", amount: 5, lineNum: 1 }), i({ type: "radishes", amount: 3, lineNum: 1 })],
         results: [
           {
             desc: "sautee",
@@ -88,7 +88,10 @@ describe("parseRecipe()", () => {
       desc: "multi-ingredient one-step recipe with basic units",
       input: "sautee: 5 onions, 3 cloves of garlic",
       result: makeResult((i) => ({
-        ingredients: [i({ type: "onions", amount: 5 }), i({ type: "cloves of garlic", amount: 3 })],
+        ingredients: [
+          i({ type: "onions", amount: 5, lineNum: 1 }),
+          i({ type: "cloves of garlic", amount: 3, lineNum: 1 }),
+        ],
         results: [
           {
             desc: "sautee",
@@ -108,10 +111,10 @@ describe("parseRecipe()", () => {
       `,
       result: makeResult((i) => ({
         ingredients: [
-          i({ type: "potatoes", amount: 2 }),
-          i({ type: "sea salt" }),
-          i({ type: "potatoes", amount: 4 }),
-          i({ type: "long pepper" }),
+          i({ type: "potatoes", amount: 2, lineNum: 2 }),
+          i({ type: "sea salt", lineNum: 3 }),
+          i({ type: "potatoes", amount: 4, lineNum: 3 }),
+          i({ type: "long pepper", lineNum: 4 }),
         ],
         results: [
           {
@@ -148,7 +151,7 @@ describe("parseRecipe()", () => {
       simmer: @paste
       `,
       result: makeResult((i) => ({
-        ingredients: [i({ type: "snozzberries", amount: 2 })],
+        ingredients: [i({ type: "snozzberries", amount: 2, lineNum: 2 })],
         results: [
           {
             desc: "simmer",
@@ -174,9 +177,9 @@ describe("parseRecipe()", () => {
       `,
       result: makeResult((i) => ({
         ingredients: [
-          i({ type: "snozzberries", amount: 2 }),
-          i({ type: "bozzsnerries" }),
-          i({ type: "hobwaries", amount: 1, unit: "tsp" }),
+          i({ type: "snozzberries", amount: 2, lineNum: 2 }),
+          i({ type: "bozzsnerries", lineNum: 3 }),
+          i({ type: "hobwaries", amount: 1, unit: "tsp", lineNum: 4 }),
         ],
         results: [
           {
@@ -216,12 +219,12 @@ describe("parseRecipe()", () => {
       `,
       result: makeResult((i) => ({
         ingredients: [
-          i({ type: "loaves of Italian bread", amount: 2 }),
-          i({ type: "head of garlic", amount: 1 }),
-          i({ type: "butter", unit: "tbsp", amount: 12 }),
-          i({ type: "Parmesan", unit: "cup", amount: 0.5 }),
-          i({ type: "salt", unit: "tsp", amount: 1 }),
-          i({ type: "black pepper", unit: "tsp", amount: 1 }),
+          i({ type: "loaves of Italian bread", amount: 2, lineNum: 2 }),
+          i({ type: "head of garlic", amount: 1, lineNum: 3 }),
+          i({ type: "butter", unit: "tbsp", amount: 12, lineNum: 4 }),
+          i({ type: "Parmesan", unit: "cup", amount: 0.5, lineNum: 5 }),
+          i({ type: "salt", unit: "tsp", amount: 1, lineNum: 7 }),
+          i({ type: "black pepper", unit: "tsp", amount: 1, lineNum: 7 }),
         ],
         results: [
           {
@@ -264,7 +267,7 @@ describe("parseRecipe()", () => {
       `,
       result: makeResult(
         (i) => ({
-          ingredients: [i({ type: "snozzberries", amount: 2 })],
+          ingredients: [i({ type: "snozzberries", amount: 2, lineNum: 2 })],
           results: [
             {
               desc: "simmer",

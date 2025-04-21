@@ -15,10 +15,12 @@ export function RecipeDiagram({
   recipeText,
   playing,
   setPlaying,
+  selectedLineRange,
 }: {
   recipeText: string;
   playing: boolean;
   setPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedLineRange: [number, number] | null;
 }): JSX.Element {
   const debouncedRecipeText = useDebounce(recipeText, 250);
 
@@ -298,16 +300,25 @@ export function RecipeDiagram({
                   statusClassName = classes[`inputStatus__${status}`] || "";
                 }
 
-                return (
-                  <td
-                    className={`${className} ${statusClassName}`.trim()}
-                    colSpan={extent}
-                    rowSpan={size}
-                    onClick={() => onClickNode(x, y)}
-                  >
-                    {inputNode}
-                  </td>
-                );
+                let selectedClassName = "";
+
+                if (selectedLineRange) {
+                  const [from, to] = selectedLineRange;
+
+                  if (input.lineNum >= from && input.lineNum <= to) selectedClassName = classes.inputSelected;
+                }
+
+                if (node.input.lineNum)
+                  return (
+                    <td
+                      className={`${className} ${statusClassName} ${selectedClassName}`.trim()}
+                      colSpan={extent}
+                      rowSpan={size}
+                      onClick={() => onClickNode(x, y)}
+                    >
+                      {inputNode}
+                    </td>
+                  );
               })}
             </tr>
           ))}

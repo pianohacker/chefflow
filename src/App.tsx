@@ -9,6 +9,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 function App() {
   const [recipeText, setRecipeText] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [selectedLineRange, setSelectedLineRange] = useState<[number, number] | null>(null);
 
   useEffect(() => {
     if (window.location.hash) {
@@ -32,8 +33,18 @@ function App() {
     <>
       <main>
         <h1 className={appStyles.mainHeader}>Chefflow</h1>
-        <RecipeDiagram playing={playing} setPlaying={setPlaying} recipeText={recipeText} />
-        <RecipeEditor playing={playing} recipeText={recipeText} setRecipeText={setRecipeText} />
+        <RecipeDiagram
+          playing={playing}
+          setPlaying={setPlaying}
+          recipeText={recipeText}
+          selectedLineRange={selectedLineRange}
+        />
+        <RecipeEditor
+          playing={playing}
+          recipeText={recipeText}
+          setRecipeText={setRecipeText}
+          setSelectedLineRange={setSelectedLineRange}
+        />
       </main>
     </>
   );

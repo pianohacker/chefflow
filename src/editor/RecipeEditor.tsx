@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import CodeMirror, { EditorView, gutter, GutterMarker, lineNumbers, StateField } from "@uiw/react-codemirror";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { HighlightStyle, LanguageSupport, LRLanguage, syntaxHighlighting } from "@codemirror/language";
@@ -227,10 +227,12 @@ function chefflowLinter(view: EditorView): readonly Diagnostic[] {
 export function RecipeEditor({
   recipeText,
   setRecipeText,
+  setSelectedLineRange,
   playing,
 }: {
   recipeText: string;
   setRecipeText: (x: string) => any;
+  setSelectedLineRange: (x: [number, number] | null) => any;
   playing: boolean;
 }): JSX.Element {
   const onPaste = useCallback(
@@ -252,6 +254,28 @@ export function RecipeEditor({
     [setRecipeText],
   );
 
+  const updateSelectedLineRangeListener = useMemo(
+    () =>
+      EditorView.updateListener.of((update) => {
+        if (!update.view.hasFocus) {
+          setSelectedLineRange(null);
+          return;
+        }
+        if (!update.selectionSet) return;
+
+        const { state } = update;
+
+        const range = state.selection.ranges[0];
+        if (!range) {
+          setSelectedLineRange(null);
+          return;
+        }
+
+        setSelectedLineRange([state.doc.lineAt(range.from).number, state.doc.lineAt(range.to).number]);
+      }),
+    [setSelectedLineRange],
+  );
+
   return (
     <CodeMirror
       readOnly={playing}
@@ -271,6 +295,7 @@ export function RecipeEditor({
         }),
         linter(chefflowLinter, { delay: 100 }),
         EditorView.lineWrapping,
+        updateSelectedLineRangeListener,
       ]}
       height="100%"
       theme={cmTheme}

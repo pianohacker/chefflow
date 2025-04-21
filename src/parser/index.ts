@@ -12,6 +12,7 @@ export type Ingredient = {
   type: string;
   amount?: number;
   unit?: Unit;
+  lineNum: number;
 };
 export const isIngredient = (x: object): x is Ingredient => !!("type" in x && x.type);
 
@@ -55,7 +56,7 @@ const GRID_MARKER_RE = /^(manual|nha|grid):/i;
 const GRID_COLUMN_SEP_RE = /^(--)$/i;
 const GRID_EMPTY_LINE_RE = /^(|blank)$/i;
 
-function parseIngredient(inputText: string): Ingredient | null {
+function parseIngredient(inputText: string, lineNum: number): Ingredient | null {
   const ingredientMatch = INGREDIENT_RE.exec(inputText);
   if (!ingredientMatch) return null;
   const [, amount, unit, type] = ingredientMatch;
@@ -72,7 +73,7 @@ function parseIngredient(inputText: string): Ingredient | null {
     }
   }
 
-  return { amount: parsedAmount, unit, type: type };
+  return { amount: parsedAmount, unit, type: type, lineNum };
 }
 
 function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
@@ -102,7 +103,7 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
 
     const stepMatch = /^(.*)\((\d+)\)$/.exec(line);
     const step = stepMatch && { desc: stepMatch[1].trimEnd(), size: parseInt(stepMatch[2]) };
-    const ingredient = parseIngredient(line);
+    const ingredient = parseIngredient(line, lineNum);
 
     if (step) {
       column[y] = {
@@ -121,7 +122,7 @@ function parseGridRecipe(input: string): { grid: Grid; errors: LineError[] } {
       column[y] = {
         size: 1,
         extent: 1,
-        input: { ...ingredient, lineNum },
+        input: ingredient,
         children: [],
       };
       y++;
@@ -224,7 +225,7 @@ export function parseRecipe(
           }
         }
 
-        const ingredient = parseIngredient(inputText);
+        const ingredient = parseIngredient(inputText, lineNum);
         if (ingredient) {
           ingredients.push(ingredient);
           return ingredient;
