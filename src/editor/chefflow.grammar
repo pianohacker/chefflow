@@ -1,8 +1,14 @@
-@top Recipe { Step* }
+@top Recipe { gridMarker GridLine* | Step* }
 
 @tokens {
 	space { @whitespace+ }
 	amount { @digit+ | @digit+ "/" @digit+ | "." @digit+ | @digit+ "." @digit+ }
+	gridQuantity { "(" @digit+ ")" }
+	gridMarker { "Grid:" | "NHA:" | "Manual:" }
+}
+
+@external tokens gridMultiWordName from "./tokens" {
+	gridMultiWordName
 }
 
 @external tokens multiWordName from "./tokens" {
@@ -21,3 +27,8 @@ Amount { amount }
 Unit { unit }
 IngredientType { multiWordName }
 Ingredient { Amount? Unit? IngredientType | BackReference }
+
+GridLine { GridDivider | GridStepDesc GridQuantity | Ingredient }
+GridDivider { "--" }
+GridStepDesc { gridMultiWordName }
+GridQuantity { gridQuantity }

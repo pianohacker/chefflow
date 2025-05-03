@@ -20,6 +20,9 @@ const chefflowParserWithMetadata = chefflowParser.configure({
       ResultName: t.variableName,
       Amount: t.number,
       Unit: t.keyword,
+      GridDivider: t.comment,
+      GridStepDesc: t.propertyName,
+      GridQuantity: t.number,
     }),
   ],
 });
@@ -83,6 +86,14 @@ const highlightStyle = HighlightStyle.define([
   {
     tag: t.keyword,
     class: sharedClasses.recipeAmount,
+  },
+  {
+    tag: t.comment,
+    class: sharedClasses.gridDivider,
+  },
+  {
+    tag: t.propertyName,
+    class: sharedClasses.gridStepDesc,
   },
 ]);
 

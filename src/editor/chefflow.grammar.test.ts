@@ -132,6 +132,103 @@ describe("lezer grammar", () => {
         ),
       )`,
     },
+    {
+      desc: "empty grid recipe",
+      input: `
+      Grid:
+
+      `,
+      result: `Recipe()`,
+    },
+    {
+      desc: "basic grid recipe",
+      input: `
+      Grid:
+      --
+      1 tbsp berry snozz
+      4 tsp snozzberries
+      --
+      fandangle (2)
+      `,
+      result: `Recipe(
+        GridLine(GridDivider),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(GridDivider),
+        GridLine(GridStepDesc, GridQuantity),
+      )`,
+    },
+    {
+      desc: "grid recipe with longer second column",
+      input: `
+      Grid:
+      --
+      1 tbsp berry snozz
+      4 tsp snozzberries
+      --
+      fandangle (2)
+      4 tbsp raspberries
+      `,
+      result: `Recipe(
+        GridLine(GridDivider),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(GridDivider),
+        GridLine(GridStepDesc, GridQuantity),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+      )`,
+    },
+    {
+      desc: "grid recipe with multiple steps per column",
+      input: `
+      Grid:
+      --
+      1 tbsp berry snozz
+      4 tsp snozzberries
+      4 lb normal berries
+      --
+      fandangle (2)
+      blend (1)
+      --
+      smush (3)
+      `,
+      result: `Recipe(
+        GridLine(GridDivider),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(GridDivider),
+        GridLine(GridStepDesc, GridQuantity),
+        GridLine(GridStepDesc, GridQuantity),
+        GridLine(GridDivider),
+        GridLine(GridStepDesc, GridQuantity),
+      )`,
+    },
+    {
+      desc: "grid recipe with blanks at start of column",
+      input: `
+      Grid:
+      --
+      1 tbsp berry snozz
+      4 tsp snozzberries
+      4 lb normal berries
+      --
+
+      fandangle (2)
+      --
+      smush (3)
+      `,
+      result: `Recipe(
+        GridLine(GridDivider),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(Ingredient(Amount, Unit, IngredientType)),
+        GridLine(GridDivider),
+        GridLine(GridStepDesc, GridQuantity),
+        GridLine(GridDivider),
+        GridLine(GridStepDesc, GridQuantity),
+      )`,
+    },
   ])("parses $desc correctly", ({ input, result }) => {
     const tree = parser.parse(input);
 

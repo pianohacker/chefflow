@@ -6,3 +6,11 @@
   text-decoration: underline;
   text-decoration-color: #888;
 }
+
+.gridDivider {
+  color: #888;
+}
+
+.gridStepDesc {
+  font-style: italic;
+}
