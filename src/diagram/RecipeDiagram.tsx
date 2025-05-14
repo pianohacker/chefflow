@@ -8,6 +8,7 @@ import classes from "./RecipeDiagram.module.css";
 import exportForCopyPaste from "./export-for-copy-paste";
 import { encodeRecipe } from "../encoding";
 import { exportGrid, fillGrid, isNode, makeGrid, makeGridFromRecipe } from "../parser/grid";
+import * as Phosphor from "@phosphor-icons/react";
 
 const DENOMINATORS = [2, 3, 4, 6, 8, 16];
 
@@ -25,6 +26,9 @@ export function RecipeDiagram({
   const debouncedRecipeText = useDebounce(recipeText, 250);
 
   const [parsedRecipe, setParsedRecipe] = useState<ReturnType<typeof parseRecipe> | null>(null);
+
+  const wakelockAvailable = "wakeLock" in navigator;
+  const [wakelock, setWakelock] = useState<WakeLockSentinel | null>(null);
 
   useEffect(() => {
     const result = parseRecipe(debouncedRecipeText);
@@ -230,6 +234,18 @@ export function RecipeDiagram({
     [playing, recipeGrid, nodeStatus, setNodeStatus],
   );
 
+  const onClickWakelock = useCallback(async () => {
+    if (wakelock) {
+      wakelock.release();
+    } else {
+      const newWakelock = await navigator.wakeLock.request("screen");
+      setWakelock(newWakelock);
+      newWakelock.addEventListener("release", () => {
+        setWakelock(null);
+      });
+    }
+  }, [wakelock]);
+
   const isTreeRecipe = "recipe" in (parsedRecipe || {});
   const onClickManual = useCallback(() => {
     if (!isTreeRecipe) return;
@@ -244,8 +260,33 @@ export function RecipeDiagram({
     <div className={`${classes.recipeDiagram} ${playing ? classes.playing : ""}`.trim()}>
       <div className={classes.controls}>
         <button className={classes.playButton} onClick={onClickPlay}>
-          {playing ? "Stop" : "Play"}
+          {playing ? (
+            <>
+              <Phosphor.Stop />
+              Stop
+            </>
+          ) : (
+            <>
+              <Phosphor.Play />
+              Play
+            </>
+          )}
         </button>
+        {wakelockAvailable && (
+          <button className={classes.wakelockButton} onClick={onClickWakelock}>
+            {wakelock ? (
+              <>
+                <Phosphor.EyeClosed />
+                Don&apos;t Keep Screen On
+              </>
+            ) : (
+              <>
+                <Phosphor.Eye />
+                Keep Screen On
+              </>
+            )}
+          </button>
+        )}
       </div>
       <table ref={diagramRef}>
         <tbody>
@@ -326,13 +367,16 @@ export function RecipeDiagram({
       </table>
       <div className={classes.controls}>
         <button className={classes.copyButton} onClick={onClickCopy}>
+          <Phosphor.Copy />
           Copy Diagram
         </button>
         <button className={classes.printButton} onClick={onClickPrint}>
+          <Phosphor.Printer />
           Print
         </button>
         {!("grid" in (parsedRecipe || {})) && (
           <button className={classes.manualButton} onClick={onClickManual}>
+            <Phosphor.Table />
             Manual Version
           </button>
         )}

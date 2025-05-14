@@ -14,9 +14,10 @@
   .controls {
     display: flex;
     justify-content: center;
-    margin: 0.6em 0;
+    padding: 0.6em;
 
     button {
+      display: flex;
       margin-right: 0.6em;
       padding: 0.3em 0.6em;
 
@@ -26,9 +27,19 @@
       border-style: solid;
       border-color: var(--cf-blue);
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      transition: box-shadow 250ms;
 
       font-family: var(--font-family);
       font-size: inherit;
+
+      svg {
+        margin-right: 0.3em;
+        width: 1.25em;
+      }
+
+      &:hover {
+        box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+      }
     }
 
     @media print {

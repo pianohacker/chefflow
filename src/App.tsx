@@ -5,6 +5,7 @@ import { RecipeEditor } from "./editor/RecipeEditor";
 import { RecipeDiagram } from "./diagram/RecipeDiagram";
 import { decodeRecipe, encodeRecipe } from "./encoding";
 import { useDebounce } from "@uidotdev/usehooks";
+import { IconContext } from "@phosphor-icons/react";
 
 function App() {
   const [recipeText, setRecipeText] = useState("");
@@ -31,21 +32,23 @@ function App() {
 
   return (
     <>
-      <main>
-        <h1 className={appStyles.mainHeader}>Chefflow</h1>
-        <RecipeDiagram
-          playing={playing}
-          setPlaying={setPlaying}
-          recipeText={recipeText}
-          selectedLineRange={selectedLineRange}
-        />
-        <RecipeEditor
-          playing={playing}
-          recipeText={recipeText}
-          setRecipeText={setRecipeText}
-          setSelectedLineRange={setSelectedLineRange}
-        />
-      </main>
+      <IconContext.Provider value={{ weight: "thin" }}>
+        <main>
+          <h1 className={appStyles.mainHeader}>Chefflow</h1>
+          <RecipeDiagram
+            playing={playing}
+            setPlaying={setPlaying}
+            recipeText={recipeText}
+            selectedLineRange={selectedLineRange}
+          />
+          <RecipeEditor
+            playing={playing}
+            recipeText={recipeText}
+            setRecipeText={setRecipeText}
+            setSelectedLineRange={setSelectedLineRange}
+          />
+        </main>
+      </IconContext.Provider>
     </>
   );
 }
