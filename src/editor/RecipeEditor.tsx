@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import type { JSX } from "react";
 import CodeMirror, { EditorView, gutter, GutterMarker, lineNumbers, StateField } from "@uiw/react-codemirror";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { HighlightStyle, LanguageSupport, LRLanguage, syntaxHighlighting } from "@codemirror/language";

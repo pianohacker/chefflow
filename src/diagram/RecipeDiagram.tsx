@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { JSX } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { isIngredient, parseRecipe } from "../parser";
 import { range } from "../utils";
